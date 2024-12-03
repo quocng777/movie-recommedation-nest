@@ -20,16 +20,20 @@ export class ResponseTransformInterceptor<T> implements NestInterceptor<T, Respo
         );
       }
      
-      errorHandler(exception: HttpException, context: ExecutionContext) {
+      errorHandler(exception: HttpException & { customCode?: number}, context: ExecutionContext) {
         const ctx = context.switchToHttp();
         const response = ctx.getResponse();
+
+        const httpCode = exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
      
         const status =
-          exception instanceof HttpException
-            ? exception.getStatus()
-            : HttpStatus.INTERNAL_SERVER_ERROR;
+          exception.customCode ? 
+          exception.customCode :
+          httpCode
      
-        response.status(status).json({
+        response.status(httpCode).json({
           statusCode: status,
           message: exception.message,
           timestamp: new Date(),
@@ -49,7 +53,8 @@ export class ResponseTransformInterceptor<T> implements NestInterceptor<T, Respo
         return {
           statusCode,
           data: res,
-          timestamp: new Date()
+          timestamp: new Date(),
+          message
         };
       }
 }

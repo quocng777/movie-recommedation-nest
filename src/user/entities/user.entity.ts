@@ -1,6 +1,11 @@
 import { Exclude } from "class-transformer";
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
+export enum AuthProvider {
+    "LOCAL" = 'local',
+    "GOOGLE" = 'google' 
+};
+
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
@@ -24,6 +29,14 @@ export class User {
 
     @Column({default: false})
     disabled: boolean;
+
+    @Column({
+        type: 'enum',
+        enum: AuthProvider,
+        default: AuthProvider.LOCAL
+    })
+    provider: AuthProvider
+
 
     @CreateDateColumn({type: 'timestamp', name: 'created_at'})
     createdAt: Date;
