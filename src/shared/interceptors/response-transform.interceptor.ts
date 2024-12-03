@@ -21,6 +21,7 @@ export class ResponseTransformInterceptor<T> implements NestInterceptor<T, Respo
       }
      
       errorHandler(exception: HttpException & { customCode?: number}, context: ExecutionContext) {
+        console.error(exception);
         const ctx = context.switchToHttp();
         const response = ctx.getResponse();
 
@@ -33,10 +34,11 @@ export class ResponseTransformInterceptor<T> implements NestInterceptor<T, Respo
           exception.customCode :
           httpCode
      
-        response.status(httpCode).json({
+        return response.status(httpCode).json({
           statusCode: status,
           message: exception.message,
           timestamp: new Date(),
+          stack: exception.stack
         });
       }
      

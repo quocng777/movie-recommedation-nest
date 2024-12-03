@@ -20,7 +20,8 @@ export class UserService {
             username,
             email,
             password,
-            fullname
+            fullname,
+            picture
         } = dto;
 
         const usernameDuplicated = await this.userRepo.count({where: {username}});
@@ -39,10 +40,17 @@ export class UserService {
             username,
             email,
             password: hashedPassword,
-            fullname
+            fullname,
+            picture
         } as User;
 
         const savedUser = await this.userRepo.save(user);
+
+        return plainToInstance(UserDto, savedUser);
+    }
+
+    async getUserByEmail (email: string) {
+        const savedUser = await this.userRepo.findOne({where: {email}});
 
         return plainToInstance(UserDto, savedUser);
     }

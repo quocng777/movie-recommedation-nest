@@ -37,6 +37,9 @@ export class User {
     })
     provider: AuthProvider
 
+    @Column({nullable: true})
+    picture: string
+
 
     @CreateDateColumn({type: 'timestamp', name: 'created_at'})
     createdAt: Date;

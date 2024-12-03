@@ -4,7 +4,7 @@ import { IsEmail, IsString, Max, MaxLength, MinLength } from "class-validator";
 export class CreateUserDto {
     @IsString()
     @MinLength(5)
-    @MaxLength(10)
+    @MaxLength(40)
     @Transform(({value}) => (typeof value === 'string') ? value.trim() : '')
     username: string;
 
@@ -14,12 +14,14 @@ export class CreateUserDto {
 
     @IsString()
     @MinLength(5)
-    @MaxLength(16)
+    @MaxLength(36)
     password: string;
 
     @MinLength(1)
     @MaxLength(40)
     fullname: string;
+
+    picture?: string;
 };
 
 export default CreateUserDto;
