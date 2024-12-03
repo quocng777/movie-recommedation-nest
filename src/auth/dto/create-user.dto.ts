@@ -19,7 +19,7 @@ export class CreateUserDto {
 
     @MinLength(1)
     @MaxLength(40)
-    fullName: string;
+    fullname: string;
 };
 
 export default CreateUserDto;

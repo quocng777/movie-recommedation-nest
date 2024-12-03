@@ -18,7 +18,7 @@ export class UserService {
             username,
             email,
             password,
-            fullName
+            fullname
         } = dto;
 
         const usernameDuplicated = await this.userRepo.count({where: {username}});
@@ -37,7 +37,7 @@ export class UserService {
             username,
             email,
             password: hashedPassword,
-            fullName
+            fullname
         } as User;
 
         const savedUser = await this.userRepo.save(user);

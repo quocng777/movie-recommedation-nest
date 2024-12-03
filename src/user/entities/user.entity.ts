@@ -16,8 +16,8 @@ export class User {
     @Exclude()
     password: string;
 
-    @Column({name: 'full_name'})
-    fullName: string;
+    @Column({name: 'fullname'})
+    fullname: string;
 
     @Column({name: 'activated', default: false})
     activated: boolean;

@@ -11,6 +11,12 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: [process.env.CORS_ORIGIN],
+    methods: '*',
+    credentials: true,
+  });
+
   app.setGlobalPrefix(process.env.ENDPOINT_PREFIX);
   await app.listen(3000);
 }
