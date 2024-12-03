@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { User } from "src/user/entities/user.entity";
 
 export const getTypeOrmModuleOptions = (): TypeOrmModuleOptions => {
     return {
@@ -10,6 +11,7 @@ export const getTypeOrmModuleOptions = (): TypeOrmModuleOptions => {
         database: process.env.DB_DATABASE,
         port: Number.parseInt(process.env.DB_PORT),
         migrationsTableName: '_migrations',
+        entities: [User],
         migrations: ['./src/migration/*.ts'],
     }
 }
