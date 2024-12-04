@@ -55,7 +55,7 @@ export class UserService {
         const savedUser = await this.userRepo.findOne({where: {email}});
 
         const user =  plainToInstance(UserDto, savedUser);
-        if(user) {
+        if(savedUser) {
             user.password = savedUser.password;
         }
 
