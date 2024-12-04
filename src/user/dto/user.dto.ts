@@ -12,7 +12,7 @@ export class UserDto {
     username: string;
 
     @Expose()
-    fullName: string;
+    fullname: string;
 
     @Expose()
     activated: boolean;
@@ -25,4 +25,6 @@ export class UserDto {
 
     @Expose()
     updatedAt: Date;
+
+    password: string;
 }

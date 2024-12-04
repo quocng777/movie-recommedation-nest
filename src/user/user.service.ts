@@ -15,13 +15,14 @@ export class UserService {
         @InjectRepository(User) private userRepo: Repository<User>
     ) {}
 
-    async save (dto: CreateUserDto): Promise<UserDto> {
+    async save (dto: CreateUserDto & {activated?: boolean}): Promise<UserDto> {
         const {
             username,
             email,
             password,
             fullname,
-            picture
+            picture,
+            activated
         } = dto;
 
         const usernameDuplicated = await this.userRepo.count({where: {username}});
@@ -41,7 +42,8 @@ export class UserService {
             email,
             password: hashedPassword,
             fullname,
-            picture
+            picture,
+            activated
         } as User;
 
         const savedUser = await this.userRepo.save(user);
@@ -52,6 +54,15 @@ export class UserService {
     async getUserByEmail (email: string) {
         const savedUser = await this.userRepo.findOne({where: {email}});
 
-        return plainToInstance(UserDto, savedUser);
+        const user =  plainToInstance(UserDto, savedUser);
+        user.password = savedUser.password;
+
+        return user;
+    }
+
+    async getUserById (id: number) {
+        const user =  await this.userRepo.findOne({where: {id}});
+
+        return plainToInstance(UserDto, user);
     }
 }
