@@ -9,6 +9,11 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseTransformInterceptor } from './shared/interceptors/response-transform.interceptor';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './shared/guards/jwt.guard';
+import { HttpModule } from '@nestjs/axios';
+import { HttpConfigService } from './config/http.config';
+import { MovieModule } from './modules/movies/movie.module';
+import { HttpClientModule } from './shared/http/http-client/http-client-module';
+import { TmdbModule } from './modules/tmdb/tmdb.module';
 
 @Module({
   imports: [
@@ -39,8 +44,18 @@ import { JwtAuthGuard } from './shared/guards/jwt.guard';
       global: true
     })
     ,
+    {
+      ...HttpModule.registerAsync({
+        useClass: HttpConfigService,
+      }),
+      global: true
+    }
+    ,
+    HttpClientModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    MovieModule,
+    TmdbModule
   ],
   providers: [
     {
@@ -51,6 +66,6 @@ import { JwtAuthGuard } from './shared/guards/jwt.guard';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     }
-  ]
+  ],
 })
 export class AppModule {}
