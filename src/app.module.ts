@@ -9,6 +9,9 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseTransformInterceptor } from './shared/interceptors/response-transform.interceptor';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './shared/guards/jwt.guard';
+import { HttpModule } from '@nestjs/axios';
+import { HttpConfigService } from './config/http.config';
+import { MovieModule } from './modules/movies/movie.module';
 
 @Module({
   imports: [
@@ -39,8 +42,16 @@ import { JwtAuthGuard } from './shared/guards/jwt.guard';
       global: true
     })
     ,
+    {
+      ...HttpModule.registerAsync({
+        useClass: HttpConfigService,
+      }),
+      global: true
+    }
+    ,
     UserModule,
-    AuthModule
+    AuthModule,
+    MovieModule,
   ],
   providers: [
     {
