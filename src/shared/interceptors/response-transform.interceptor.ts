@@ -1,8 +1,9 @@
 import { CallHandler, ExecutionContext, HttpException, HttpStatus, Injectable, NestInterceptor } from "@nestjs/common";
 import { Response } from "../dtos/response.dto";
-import { catchError, map, Observable, throwError } from "rxjs";
+import { catchError, map, Observable, throwError, timestamp } from "rxjs";
 import { Reflector } from "@nestjs/core";
 import { RESPONSE_MESSAGE_METADATA } from "../decorators/response-message.decorator";
+import { PaginationDto } from "../dtos/pagination.dto";
 
 @Injectable()
 export class ResponseTransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
@@ -51,7 +52,17 @@ export class ResponseTransformInterceptor<T> implements NestInterceptor<T, Respo
             RESPONSE_MESSAGE_METADATA,
             context.getHandler(),
         ) || HttpStatus.OK.toString();
-     
+
+        if(res.pagination) {
+          return {
+            statusCode,
+            data: res.data,
+            pagination: res.pagination as PaginationDto,
+            timestamp: new Date(),
+            message
+          }
+        }
+    
         return {
           statusCode,
           data: res,

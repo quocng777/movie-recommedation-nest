@@ -12,6 +12,7 @@ import { JwtAuthGuard } from './shared/guards/jwt.guard';
 import { HttpModule } from '@nestjs/axios';
 import { HttpConfigService } from './config/http.config';
 import { MovieModule } from './modules/movies/movie.module';
+import { HttpClientModule } from './shared/http/http-client/http-client-module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { MovieModule } from './modules/movies/movie.module';
       global: true
     }
     ,
+    HttpClientModule,
     UserModule,
     AuthModule,
     MovieModule,
@@ -62,6 +64,6 @@ import { MovieModule } from './modules/movies/movie.module';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     }
-  ]
+  ],
 })
 export class AppModule {}
