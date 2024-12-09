@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { UserService } from "src/user/user.service";
+import { UserService } from "src/modules/user/user.service";
 import CreateUserDto from "./dto/create-user.dto";
-import { UserDto } from "src/user/dto/user.dto";
+import { UserDto } from "src/modules/user/dto/user.dto";
 import { OAuth2Client } from "google-auth-library";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
