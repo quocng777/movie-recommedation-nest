@@ -13,6 +13,7 @@ import { HttpModule } from '@nestjs/axios';
 import { HttpConfigService } from './config/http.config';
 import { MovieModule } from './modules/movies/movie.module';
 import { HttpClientModule } from './shared/http/http-client/http-client-module';
+import { TmdbModule } from './modules/tmdb/tmdb.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { HttpClientModule } from './shared/http/http-client/http-client-module';
     UserModule,
     AuthModule,
     MovieModule,
+    TmdbModule
   ],
   providers: [
     {

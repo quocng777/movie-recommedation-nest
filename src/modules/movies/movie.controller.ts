@@ -16,7 +16,7 @@ export class MovieController {
     @Public()
     @Get('/trending')
     async getTrendingMovie() {
-        const res = await this.httpClient.get<TmdbPageResponse<TmdbMovieDto>>();
+        const res = await this.httpClient.get<TmdbPageResponse<TmdbMovieDto>>({url: ''});
         return {
             data: res.results,
             pagination: extractPaginationFromTmdbResponse(res)

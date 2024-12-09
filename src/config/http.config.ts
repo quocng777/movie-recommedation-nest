@@ -9,7 +9,7 @@ export class HttpConfigService implements HttpModuleOptionsFactory {
 
     createHttpOptions(): Promise<HttpModuleOptions> | HttpModuleOptions {
         return {
-            timeout: 5000,
+            timeout: 10000,
             maxRedirects: 5,
             baseURL: this.configService.get('TMDB_API_BASE_URL'),
             headers: {
