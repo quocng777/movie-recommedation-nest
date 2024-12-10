@@ -26,5 +26,8 @@ export class UserDto {
     @Expose()
     updatedAt: Date;
 
+    @Expose()
+    picture: string;
+
     password: string;
 }
