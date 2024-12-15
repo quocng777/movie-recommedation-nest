@@ -1,5 +1,5 @@
 import { HttpService } from "@nestjs/axios";
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { AxiosError } from "axios";
 import { catchError, firstValueFrom } from "rxjs";
 
@@ -13,6 +13,9 @@ export class HttpClient {
             this.httpService.get<T>(url, {params}).pipe(
                 catchError((error: AxiosError) => {
                     console.error(error);
+                    if(error.status === HttpStatus.NOT_FOUND) {
+                        throw new NotFoundException()
+                    };
                     throw new InternalServerErrorException();
                 }),
             ),
