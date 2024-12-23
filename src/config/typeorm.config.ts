@@ -16,8 +16,8 @@ export const dataSourceOptions: DataSourceOptions = {
     migrationsTableName: '_migrations',
     logging: true,
     entities: [User, LikedMovie],
-    migrations: ['src/migrations/*{.js,.ts}'],
-    // migrationsRun: true,
+    migrations: ['../migrations/*{.ts,.js}'],
+    migrationsRun: false,
 };
 
 export const dataSource = new DataSource(dataSourceOptions);
