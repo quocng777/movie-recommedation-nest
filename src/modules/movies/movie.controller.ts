@@ -49,4 +49,28 @@ export class MovieController {
 
         return this.movieService.removeLikedMovie(user.id, movieId);
     }
+
+    @Get('/watch-later')
+    async getWatchLaterList(@Req() req) {
+        const user = req.user as UserDto;
+        return this.movieService.findAllWatchLater(user.id);
+    }
+
+    @Post('/watch-later')
+    @HttpCode(HttpStatus.CREATED)
+    async addMovieToWatchLater(@Req() req, @Body() body: Record<string, any>) {
+        const { movieId } = body;
+        const user = req.user as UserDto;
+
+        return this.movieService.addMovieToWatchLater(user.id, movieId);
+    }
+
+    @Delete('/watch-later')
+    @HttpCode(HttpStatus.OK)
+    async deleteMovieFromWatchLater(@Req() req, @Body() body: Record<string, any> ) {
+        const {movieId} = body;
+        const user = req.user as UserDto;
+
+        return this.movieService.removeFromWatchLater(user.id, movieId);
+    }
 };

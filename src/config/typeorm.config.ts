@@ -2,6 +2,7 @@ import { config as dotenvConfig } from "dotenv";
 import LikedMovie from "../modules/movies/entities/liked-movie.entity";
 import User from "../modules/user/entities/user.entity";
 import { DataSource, DataSourceOptions } from "typeorm";
+import WatchLater from "@/modules/movies/entities/watch-later.entity";
 
 dotenvConfig();
 
@@ -15,8 +16,8 @@ export const dataSourceOptions: DataSourceOptions = {
     port: Number.parseInt(process.env.DB_PORT),
     migrationsTableName: '_migrations',
     logging: true,
-    entities: [User, LikedMovie],
-    migrations: ['../migrations/*{.ts,.js}'],
+    entities: [User, LikedMovie, WatchLater],
+    migrations: ['../migrations/*{.ts,.js}'], //problem: when you want to run migration please change the path to 'src/migration/*{.ts,.js}''. I'm trying to fix it, but not now
     migrationsRun: false,
 };
 

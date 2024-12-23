@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import LikedMovie from "./entities/liked-movie.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { PaginationConfig, SortDirection } from "@/shared/constants/pagination";
 import PaginationResponse from "@/shared/types/pagination-response";
 import TmdbService from "../tmdb/tmdb.service";
+import WatchLater from "./entities/watch-later.entity";
 
 export interface MovieQueryOptions {
     page?: number;
@@ -18,7 +19,8 @@ export interface MovieQueryOptions {
 export default class MovieService {
     constructor(
         @InjectRepository(LikedMovie) private readonly likedMovieRepo: Repository<LikedMovie>,
-        private readonly tmdbService: TmdbService
+        private readonly tmdbService: TmdbService,
+        @InjectRepository(WatchLater) private readonly watchLaterRepo: Repository<WatchLater>,
     ) {}
 
     // async findLikedMoviesByUserId(userId: number, options?: MovieQueryOptions): Promise<PaginationResponse> {
@@ -91,6 +93,55 @@ export default class MovieService {
     async removeLikedMovie(userId: number, movieId: number) {
 
         const affected = (await this.likedMovieRepo.delete({user: {id: userId}, movieId})).affected;
+        if(affected < 1) {
+            throw new NotFoundException('Not found movie');
+        }
+
+        return affected;
+    }
+
+    async findAllWatchLater(userId: number) {
+        const watchList = await this.watchLaterRepo.find({
+            where: {
+                user: {id: userId},
+            },
+            order: {
+                createdAt: SortDirection.DESC
+            },
+        });
+        const data = watchList.map((movie) => movie.movieId);
+        return data;
+    }
+
+    async addMovieToWatchLater(userId: number, movieId: number) {
+        const movie = await this.tmdbService.getMovieById(movieId);
+
+        if(!movie) {
+            throw new NotFoundException(`Not found movie`);
+        };
+
+        const watchLater = await this.watchLaterRepo.findOneBy({
+            user: {id: userId},
+            movieId
+        });
+
+        if(watchLater) {
+            throw new BadRequestException('Added this movie before');
+        }
+
+        const savedData = await this.watchLaterRepo.save({
+            user: {
+                id: userId
+            },
+            movieId
+        });
+
+        return movieId;
+    }
+
+    async removeFromWatchLater(userId: number, movieId: number) {
+
+        const affected = (await this.watchLaterRepo.delete({user: {id: userId}, movieId})).affected;
         if(affected < 1) {
             throw new NotFoundException('Not found movie');
         }
