@@ -7,7 +7,7 @@ export enum AuthProvider {
 };
 
 @Entity()
-export class User {
+export default class User {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -46,4 +46,4 @@ export class User {
 
     @UpdateDateColumn({type: 'timestamp', name: 'updated_at'})
     updatedAt: Date;
-}
+};

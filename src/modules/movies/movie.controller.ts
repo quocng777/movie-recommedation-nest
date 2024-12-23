@@ -1,7 +1,5 @@
 import { HttpService } from "@nestjs/axios";
 import { Controller, Get, Req } from "@nestjs/common";
-import { AxiosError } from "axios";
-import { catchError, firstValueFrom } from "rxjs";
 import { Public } from "src/shared/decorators/public.recorator";
 import { HttpClient } from "src/shared/http/http-client/http-client";
 import { TmdbMovieDto } from "src/shared/tmdb/dtos/tmdb-movie.dto";

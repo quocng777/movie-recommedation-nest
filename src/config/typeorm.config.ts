@@ -1,7 +1,6 @@
-
-import { registerAs } from "@nestjs/config";
-import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { config as dotenvConfig } from "dotenv";
+import LikedMovie from "../modules/movies/entities/liked-movie.entity";
+import User from "../modules/user/entities/user.entity";
 import { DataSource, DataSourceOptions } from "typeorm";
 
 dotenvConfig();
@@ -16,8 +15,8 @@ export const dataSourceOptions: DataSourceOptions = {
     port: Number.parseInt(process.env.DB_PORT),
     migrationsTableName: '_migrations',
     logging: true,
-    entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    migrations: [__dirname + '/migrations/*{.ts,.js}'],
+    entities: [User, LikedMovie],
+    migrations: ['src/migrations/*{.js,.ts}'],
     // migrationsRun: true,
 };
 
