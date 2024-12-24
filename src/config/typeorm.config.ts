@@ -3,8 +3,8 @@ import LikedMovie from "../modules/movies/entities/liked-movie.entity";
 import User from "../modules/user/entities/user.entity";
 import { DataSource, DataSourceOptions } from "typeorm";
 import WatchLater from "@/modules/movies/entities/watch-later.entity";
-import Playlist from "@/modules/movies/entities/playlist.entity";
-import PlaylistItem from "@/modules/movies/entities/playlist-item.entity";
+import Playlist from "@/modules/playlist/entities/playlist.entity";
+import PlaylistItem from "@/modules/playlist/entities/playlist-item.entity";
 
 dotenvConfig();
 
