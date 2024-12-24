@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { getTypeOrmModuleOptions } from './config/typeorm.config';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
@@ -14,6 +13,8 @@ import { HttpConfigService } from './config/http.config';
 import { MovieModule } from './modules/movies/movie.module';
 import { HttpClientModule } from './shared/http/http-client/http-client-module';
 import { TmdbModule } from './modules/tmdb/tmdb.module';
+import { dataSourceOptions } from './config/typeorm.config';
+import PlaylistModule from './modules/playlist/playlist.module';
 
 @Module({
   imports: [
@@ -23,13 +24,7 @@ import { TmdbModule } from './modules/tmdb/tmdb.module';
     ConfigModule.forRoot({
       isGlobal: true
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (ConfigService: ConfigService) => {
-        return getTypeOrmModuleOptions();
-      }
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -37,7 +32,7 @@ import { TmdbModule } from './modules/tmdb/tmdb.module';
         return {
           secret: process.env.JWT_SECRET,
           signOptions: {
-            expiresIn: 8 * 60 * 1000
+            expiresIn: 8 * 60 * 10000000
           }
         }
       },
@@ -55,7 +50,8 @@ import { TmdbModule } from './modules/tmdb/tmdb.module';
     UserModule,
     AuthModule,
     MovieModule,
-    TmdbModule
+    TmdbModule,
+    PlaylistModule,
   ],
   providers: [
     {

@@ -88,7 +88,7 @@ export class AuthService {
     private generateTokePair(payload) {
         const accessToken = this.jwtService.sign(
         payload, {
-            expiresIn: '8m'
+            expiresIn: '2d'
         });
 
         const refreshToken = this.jwtService.sign(
