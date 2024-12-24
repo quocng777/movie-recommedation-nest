@@ -17,7 +17,6 @@ export const dataSourceOptions: DataSourceOptions = {
     database: process.env.DB_DATABASE,
     port: Number.parseInt(process.env.DB_PORT),
     migrationsTableName: '_migrations',
-    logging: true,
     entities: [User, LikedMovie, WatchLater, Playlist, PlaylistItem],
     migrations: ['dist/migrations/*{.ts,.js}'], //problem: when you want to run migration please change the path to 'src/migration/*{.ts,.js}''. I'm trying to fix it, but not now
     migrationsRun: false,

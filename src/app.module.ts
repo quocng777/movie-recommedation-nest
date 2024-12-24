@@ -32,7 +32,7 @@ import PlaylistModule from './modules/playlist/playlist.module';
         return {
           secret: process.env.JWT_SECRET,
           signOptions: {
-            expiresIn: 8 * 60 * 1000
+            expiresIn: 8 * 60 * 10000000
           }
         }
       },

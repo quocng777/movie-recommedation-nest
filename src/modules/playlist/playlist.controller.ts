@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, UsePipes, ValidationPipe } from "@nestjs/common";
 import PlaylistService from "./playlist.service";
 import { ResponseMessage } from "@/shared/decorators/response-message.decorator";
 import CreatePlaylistDto from "./dtos/create-playlist.dto";
@@ -21,10 +21,23 @@ export default class PlaylistController {
     }
 
     @Get('/')
-    async getMyPlaylist(@Req() req) {
+    async getMyPlaylist(@Req() req, @Query() query) {
         const user = req.user as UserDto;
 
-        return this.playlistService.getPlaylist(user.id);
+        const {
+            movieId
+        } = query;
+
+        return this.playlistService.getPlaylist(user.id, {movieId});
+    }
+
+    @Post('/:id/movies')
+    async addMovieToPlayList(@Req() req, @Param() param, @Body() body: Record<string, any>) {
+        const {id} = param;
+        const user = req.user as UserDto;
+        const {movieId} = body;
+
+        return this.playlistService.addMovie(user.id, id, movieId);
     }
 
 

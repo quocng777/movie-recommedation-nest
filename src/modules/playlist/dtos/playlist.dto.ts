@@ -4,6 +4,9 @@ import { PlayListAccessibility } from "../entities/playlist.entity";
 @Exclude()
 export default class PlaylistDto {
     @Expose()
+    id: number;
+    
+    @Expose()
     name: string;
 
     @Expose()
