@@ -19,7 +19,7 @@ export const dataSourceOptions: DataSourceOptions = {
     migrationsTableName: '_migrations',
     logging: true,
     entities: [User, LikedMovie, WatchLater, Playlist, PlaylistItem],
-    migrations: ['../migrations/*{.ts,.js}'], //problem: when you want to run migration please change the path to 'src/migration/*{.ts,.js}''. I'm trying to fix it, but not now
+    migrations: ['dist/migrations/*{.ts,.js}'], //problem: when you want to run migration please change the path to 'src/migration/*{.ts,.js}''. I'm trying to fix it, but not now
     migrationsRun: false,
 };
 

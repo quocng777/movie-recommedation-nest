@@ -14,6 +14,7 @@ import { MovieModule } from './modules/movies/movie.module';
 import { HttpClientModule } from './shared/http/http-client/http-client-module';
 import { TmdbModule } from './modules/tmdb/tmdb.module';
 import { dataSourceOptions } from './config/typeorm.config';
+import PlaylistModule from './modules/playlist/playlist.module';
 
 @Module({
   imports: [
@@ -49,7 +50,8 @@ import { dataSourceOptions } from './config/typeorm.config';
     UserModule,
     AuthModule,
     MovieModule,
-    TmdbModule
+    TmdbModule,
+    PlaylistModule,
   ],
   providers: [
     {

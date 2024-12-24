@@ -16,8 +16,10 @@ export default class Playlist {
     @ManyToOne(type => User, { onDelete: 'CASCADE' })
     user: User;
 
+    @Column()
     name: string;
 
+    @Column()
     description: string;
 
     @Column({
