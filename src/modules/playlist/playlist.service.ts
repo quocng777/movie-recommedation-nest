@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException, UsePipes, ValidationPipe } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import Playlist, { PlayListAccessibility } from "./entities/playlist.entity";
 import { Repository } from "typeorm";
@@ -191,5 +191,30 @@ export default class PlaylistService {
             id: playlistId,
         });
         return playlistId;
+    }
+
+   
+    async updatePlaylist(userId: number, playlistId: number, dto: CreatePlaylistDto) {
+        const savedData = await this.playlistRepo.findOne({
+            where: {
+                user: {
+                    id: userId,
+                },
+                id: playlistId,
+            },
+        });
+
+        if(!savedData) {
+            throw new NotFoundException('not found playlist');
+        }
+
+        const data = {
+            ...savedData,
+            ...dto,
+        };
+
+        const res = await this.playlistRepo.save(data);
+
+        return plainToInstance(PlaylistDto, res);
     }
 };

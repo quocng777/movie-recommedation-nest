@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, Req, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req, UsePipes, ValidationPipe } from "@nestjs/common";
 import PlaylistService from "./playlist.service";
 import { ResponseMessage } from "@/shared/decorators/response-message.decorator";
 import CreatePlaylistDto from "./dtos/create-playlist.dto";
@@ -37,6 +37,15 @@ export default class PlaylistController {
         const {id} = param;
 
         return this.playlistService.deletePlaylist(user.id, id);
+    }
+
+    @Put('/:id')
+    @UsePipes(new ValidationPipe())
+    async updatePlaylist(@Req() req, @Param() param, @Body() body: CreatePlaylistDto) {
+        const user = req.user as UserDto;
+        const {id} = param;
+
+        return this.playlistService.updatePlaylist(user.id, id, body);
     }
 
     @Post('/:id/movies')
