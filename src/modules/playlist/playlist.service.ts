@@ -94,4 +94,28 @@ export default class PlaylistService {
             updatedAt: data.updatedAt,
         };
     }
+
+    async removeMovie(userId: number, playlistId: number, movieId: number) {
+        const item = await this.playlistItemRepo.findOne({
+            where: {
+                movieId: movieId, 
+                playlist: {
+                    id: playlistId,
+                    user: {
+                        id: userId,
+                    },
+                }
+            }
+        });
+
+        if(!item) {
+            throw new NotFoundException('Not found playlist item');
+        }
+
+        await this.playlistItemRepo.delete({
+            id: item.id,
+        });
+
+        return playlistId;
+    }
 };
