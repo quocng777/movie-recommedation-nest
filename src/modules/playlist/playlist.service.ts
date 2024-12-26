@@ -8,6 +8,7 @@ import PlaylistDto from "./dtos/playlist.dto";
 import { plainToInstance } from "class-transformer";
 import TmdbService from "../tmdb/tmdb.service";
 import PlaylistItem from "./entities/playlist-item.entity";
+import PlaylistUserDto from "./dtos/playlist-user.dto";
 
 export type PlaylistQueryOption = {
     movieId?: number;
@@ -39,7 +40,7 @@ export default class PlaylistService {
         return plainToInstance(PlaylistDto, savedData);
     }
 
-    async getPlaylist(userId: number, option?: PlaylistQueryOption) {
+    async getPlaylists(userId: number, option?: PlaylistQueryOption) {
         const { movieId } = option ?? {};
         
         const data = await this.playlistRepo.find({
@@ -216,5 +217,24 @@ export default class PlaylistService {
         const res = await this.playlistRepo.save(data);
 
         return plainToInstance(PlaylistDto, res);
+    }
+
+    async getPlaylist(playlistId: number, userId?: number) {
+        const playlist = await this.playlistRepo.findOne({
+            where: {
+                id: playlistId,
+            },
+            relations: ['user'],
+        });
+
+        if(!playlist) {
+            throw new NotFoundException('not found playlist');
+        }
+        
+        if(playlist.accessibility != PlayListAccessibility.PUBLIC && playlist.user.id !== userId) {
+            throw new NotFoundException('not found playlist');
+        }
+
+        return plainToInstance(PlaylistUserDto, playlist);
     }
 };

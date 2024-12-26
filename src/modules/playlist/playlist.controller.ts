@@ -3,6 +3,7 @@ import PlaylistService from "./playlist.service";
 import { ResponseMessage } from "@/shared/decorators/response-message.decorator";
 import CreatePlaylistDto from "./dtos/create-playlist.dto";
 import { UserDto } from "../user/dto/user.dto";
+import { Public } from "@/shared/decorators/public.recorator";
 
 @Controller('/playlist')
 export default class PlaylistController {
@@ -21,14 +22,14 @@ export default class PlaylistController {
     }
 
     @Get('/')
-    async getMyPlaylist(@Req() req, @Query() query) {
+    async getMyPlaylists(@Req() req, @Query() query) {
         const user = req.user as UserDto;
 
         const {
             movieId
         } = query;
 
-        return this.playlistService.getPlaylist(user.id, {movieId});
+        return this.playlistService.getPlaylists(user.id, {movieId});
     }
 
     @Delete('/:id')
@@ -55,6 +56,16 @@ export default class PlaylistController {
         const {movieId} = body;
 
         return this.playlistService.addMovie(user.id, id, movieId);
+    }
+
+    @Public()
+    @Get('/:id')
+    async getPlaylist(@Req() req, @Param() param) {
+        const {id} = param;
+        const user = req.user;
+        const userId = user?.id;
+
+        return this.playlistService.getPlaylist(id, userId);
     }
 
     @Delete('/:id/movies')
