@@ -1,16 +1,23 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import Playlist from "./entities/playlist.entity";
+import Playlist, { PlayListAccessibility } from "./entities/playlist.entity";
 import { Repository } from "typeorm";
 import CreatePlaylistDto from "./dtos/create-playlist.dto";
-import { SortDirection } from "@/shared/constants/pagination";
+import { PaginationConfig, SortDirection } from "@/shared/constants/pagination";
 import PlaylistDto from "./dtos/playlist.dto";
 import { plainToInstance } from "class-transformer";
 import TmdbService from "../tmdb/tmdb.service";
 import PlaylistItem from "./entities/playlist-item.entity";
 
 export type PlaylistQueryOption = {
-    movieId?: number,
+    movieId?: number;
+};
+
+export type MovieQueryOptions = {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortDir?: SortDirection;
 };
 
 @Injectable()
@@ -116,6 +123,73 @@ export default class PlaylistService {
             id: item.id,
         });
 
+        return playlistId;
+    }
+
+    async getMovies(playlistId: number, userId?: number, options?: MovieQueryOptions) {
+
+        const { 
+            page = 0, 
+            limit = PaginationConfig.ELEMENTS_PER_PAGE, 
+            sortDir = SortDirection.DESC, 
+            sortBy = 'updatedAt'
+        } = options ?? {};
+
+        const playlist = await this.playlistRepo.findOne({
+            where: {
+                id: playlistId,
+            },
+            relations: ['user'],
+        });
+
+        if(!playlist) {
+            throw new NotFoundException('Not found playlist');
+        };
+
+        if(playlist.accessibility === PlayListAccessibility.PRIVATE && userId !== playlist.user.id) {
+            throw new NotFoundException('Not found exception');
+        };
+
+        const items = await this.playlistItemRepo.findAndCount({
+            where: {
+                playlist: {
+                    id: playlistId,
+                }
+            },
+            order: {
+                [sortBy]: sortDir,
+            },
+            skip: (page * limit),
+            take: limit,
+        });
+
+        return {
+            data: items[0].map(item => item.movieId),
+            pagination: {
+                totalPages: Math.ceil(items[1] / limit),
+                totalRecords: items[1],
+                currentPage: page,
+            }
+        }
+    }
+
+    async deletePlaylist(userId: number, playlistId) {
+        const check = await this.playlistRepo.count({
+            where: {
+                user: {
+                    id: userId,
+                },
+                id: playlistId
+            }
+        });
+
+        if(check < 1) {
+            throw new NotFoundException('not found playlist');
+        }
+
+        await this.playlistRepo.delete({
+            id: playlistId,
+        });
         return playlistId;
     }
 };

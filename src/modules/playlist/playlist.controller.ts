@@ -31,6 +31,14 @@ export default class PlaylistController {
         return this.playlistService.getPlaylist(user.id, {movieId});
     }
 
+    @Delete('/:id')
+    async deletePlaylist(@Req() req, @Param() param) {
+        const user = req.user as UserDto;
+        const {id} = param;
+
+        return this.playlistService.deletePlaylist(user.id, id);
+    }
+
     @Post('/:id/movies')
     async addMovieToPlayList(@Req() req, @Param() param, @Body() body: Record<string, any>) {
         const {id} = param;
@@ -47,5 +55,13 @@ export default class PlaylistController {
         const {movieId} = body;
 
         return this.playlistService.removeMovie(user.id, id, movieId);
+    }
+
+    @Get('/:id/movies')
+    async getMovies(@Req() req, @Param() param, @Query() query) {
+        const {id} = param;
+        const user = req.user as UserDto;
+
+        return this.playlistService.getMovies(id, user.id, query);
     }
 };
