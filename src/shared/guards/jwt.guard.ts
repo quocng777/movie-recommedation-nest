@@ -19,18 +19,15 @@ export class JwtAuthGuard implements CanActivate {
             context.getClass()
         ])
 
-        if(isPublic)
-            return true;
-
-        // const request = context.switchToHttp().getRequest();
-
         const ctx = context.switchToHttp();
         const req = ctx.getRequest();
         
         const token = this.getToken(req);
 
-        if(!token) {
+        if(!token && !isPublic) {
             throw new UnauthorizedException("Invalid token");
+        } else if (!token && isPublic) {
+            return true;
         }
 
         try {
@@ -55,13 +52,13 @@ export class JwtAuthGuard implements CanActivate {
     private getToken(request: Request): string {
         const authHeader = request.headers.authorization;
         if(!authHeader) {
-            throw new UnauthorizedException("Invalid token");
+            return null;
         }
 
         if(authHeader.startsWith('Bearer ')) {
             return authHeader.substring(7);
         }
 
-        throw new UnauthorizedException("Invalid token");
+        return null;
     }
 }

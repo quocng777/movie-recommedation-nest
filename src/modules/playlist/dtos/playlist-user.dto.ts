@@ -1,9 +1,10 @@
 import { Exclude, Expose } from "class-transformer";
 import { PlayListAccessibility } from "../entities/playlist.entity";
 import { UserDto } from "@/modules/user/dto/user.dto";
+import { UserMiniDto } from "@/modules/user/dto/user-mini.dto";
 
 @Exclude()
-export default class PlaylistDto {
+export default class PlaylistUserDto {
     @Expose()
     id: number;
     
@@ -18,6 +19,9 @@ export default class PlaylistDto {
 
     @Expose()
     createdAt: Date;
+
+    @Expose()
+    user: UserMiniDto;
 
     @Expose()
     updatedAt: Date;
