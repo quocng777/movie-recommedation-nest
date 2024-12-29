@@ -9,6 +9,11 @@ import LoginDto from "./dto/login.dto";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
 import { Public } from "src/shared/decorators/public.recorator";
+import { MailerService } from "@nestjs-modules/mailer";
+import { MailSubjects } from "@/shared/constants/mail.constant";
+import { use } from "passport";
+import { TokenTypes } from "@/shared/constants/token-type";
+import { getActivationAccountEmailTemplate } from "@/shared/helpers/email-template";
 
 const GOOGLE_API_URL = 'https://www.googleapis.com/oauth2/v1/userinfo';
 @Injectable()
@@ -17,10 +22,19 @@ export class AuthService {
         private userService: UserService,
         @Inject('GOOGLE_OAUTH2_CLIENT') private oAuth2Client: OAuth2Client,
         private jwtService: JwtService,
+        private readonly mailerService: MailerService,
     ) {}
 
-    async registerUser(dto: CreateUserDto): Promise<UserDto> {
-        return this.userService.save(dto);
+    async registerUser(dto: CreateUserDto) {
+        const data = {
+            ...dto,
+            activated: false,
+        }
+        
+        const user = await this.userService.save(data);
+
+        this.sendActivateEmail(user);
+        return this.generateTokePair({sub: user.id});
     };
 
     async validateGoogleLogin(token: string) {
@@ -104,5 +118,22 @@ export class AuthService {
         }
     };
 
+    private async sendActivateEmail(user: UserDto) {
 
+        const verifyAccountToken = this.jwtService.sign(
+            {
+                sub: user.id,
+                type: TokenTypes.ACCOUNT_ACTIVATION,
+            }, {
+                expiresIn: '10m'
+            });
+        
+        this
+            .mailerService
+            .sendMail({
+                to: user.email,
+                subject: MailSubjects.ACTIVATE_ACCOUNT,
+                html: getActivationAccountEmailTemplate({username: user.fullname, activateLink: `http://localhost:5173/activate-account?token=${verifyAccountToken}`}),
+            })
+    }
 }
