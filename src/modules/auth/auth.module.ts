@@ -5,9 +5,11 @@ import { AuthService } from "./auth.service";
 import { OAuth2Client } from "google-auth-library";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import User from "../user/entities/user.entity";
 
 @Module({
-    imports: [UserModule],
+    imports: [UserModule, TypeOrmModule.forFeature([User])],
     providers: [
       AuthService, 
       {
