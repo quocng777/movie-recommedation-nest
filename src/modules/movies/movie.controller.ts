@@ -8,8 +8,10 @@ import { extractPaginationFromTmdbResponse } from "src/shared/tmdb/helpers/extra
 import MovieService from "./movie.service";
 import { UserDto } from "../user/dto/user.dto";
 import { ResponseMessage } from "@/shared/decorators/response-message.decorator";
+import { Auth } from "@/shared/decorators/auth.decorator";
 
 @Controller('/movies')
+@Auth()
 export class MovieController {
     constructor(
         private readonly httpClient: HttpClient,

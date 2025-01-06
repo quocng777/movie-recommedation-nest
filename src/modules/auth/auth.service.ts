@@ -96,10 +96,47 @@ export class AuthService {
             throw new UnauthorizedException('credentials are not valid');
         };
 
-        return this.generateTokePair({sub: user.id});
+        const {
+          password,
+          ...result
+        } = user;
+
+        return {
+
+        }
     }
 
-    private generateTokePair(payload) {
+    async verifyActivateToken(token: string) {
+        const payload = await this.jwtService.verifyAsync(token, {
+            secret: process.env.JWT_SECRET
+        });
+
+        const {
+            sub,
+            type,
+        } = payload;
+
+        const user = await this.userService.getUserById(sub);
+
+        if(!user) {
+            throw new NotFoundException('user not found');
+        };
+
+        if(user.activated) {
+            throw new BadRequestException('user is verified');
+        };
+
+        if(type !== TokenTypes.ACCOUNT_ACTIVATION) {
+            throw new BadRequestException('not valid token');
+        };
+
+        user.activated = true;
+        const savedData = this.userService.save(user);
+
+        return savedData;
+    }
+
+    generateTokePair(payload) {
         const accessToken = this.jwtService.sign(
         payload, {
             expiresIn: '2d'
