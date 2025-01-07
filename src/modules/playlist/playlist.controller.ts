@@ -4,7 +4,9 @@ import { ResponseMessage } from "@/shared/decorators/response-message.decorator"
 import CreatePlaylistDto from "./dtos/create-playlist.dto";
 import { UserDto } from "../user/dto/user.dto";
 import { Public } from "@/shared/decorators/public.recorator";
+import { Auth } from "@/shared/decorators/auth.decorator";
 
+@Auth()
 @Controller('/playlist')
 export default class PlaylistController {
     constructor(

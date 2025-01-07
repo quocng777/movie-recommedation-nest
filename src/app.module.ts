@@ -15,6 +15,8 @@ import { HttpClientModule } from './shared/http/http-client/http-client-module';
 import { TmdbModule } from './modules/tmdb/tmdb.module';
 import { dataSourceOptions } from './config/typeorm.config';
 import PlaylistModule from './modules/playlist/playlist.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { mailerOptions } from './config/mailer.config';
 
 @Module({
   imports: [
@@ -37,8 +39,8 @@ import PlaylistModule from './modules/playlist/playlist.module';
         }
       },
       global: true
-    })
-    ,
+    }),
+    MailerModule.forRoot(mailerOptions),
     {
       ...HttpModule.registerAsync({
         useClass: HttpConfigService,
@@ -58,10 +60,10 @@ import PlaylistModule from './modules/playlist/playlist.module';
       provide: APP_INTERCEPTOR,
       useClass: ResponseTransformInterceptor,
     },
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    }
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // }
   ],
 })
 export class AppModule {}

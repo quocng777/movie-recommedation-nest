@@ -1,28 +1,25 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, UsePipes, ValidationPipe } from "@nestjs/common";
 import CreateUserDto from "./dto/create-user.dto";
 import { AuthService } from "./auth.service";
 import { ResponseMessage } from "src/shared/decorators/response-message.decorator";
-import LoginDto from "./dto/login.dto";
-import { Public } from "src/shared/decorators/public.recorator";
+import { Auth } from "@/shared/decorators/auth.decorator";
 
 @Controller('/auth')
 export class AuthController {
     constructor(
-        private authService: AuthService
+        private authService: AuthService,
     ) {}
 
     @Post('/register')
     @UsePipes(new ValidationPipe())
     @HttpCode(HttpStatus.CREATED)
     @ResponseMessage("User created successfully")
-    @Public()
     async register(@Body() dto: CreateUserDto) {
         return this.authService.registerUser(dto);
     }
 
     @Post('google')
     @HttpCode(HttpStatus.OK)
-    @Public()
     async googleLogin(@Body() body: { token: string }) {
         const { token } = body;
         const user = await this.authService.validateGoogleLoginViaAccessToken(token);
@@ -31,8 +28,45 @@ export class AuthController {
 
     @Post('login')
     @HttpCode(HttpStatus.OK)
-    @Public()
-    async login(@Body() dto: LoginDto) {
-        return this.authService.login(dto);
+    @Auth()
+    async login(@Req() req) {
+      return this.authService.generateTokePair({
+        sub: req.user.id,
+      });
+    }
+
+    @Get('/activate-account')
+    async activateAccount(@Query() query: Record<string, any>) {
+      const {token} = query;
+      return this.authService.verifyActivateToken(token);
+    }
+
+    @Get('/reset-password')
+    async sendResetPasswordEmail(@Query() query: Record<string, any>) {
+      const {email} = query;
+      if(!email) {
+        throw new BadRequestException('email is required');
+      }
+
+      this.authService.sendResetPasswordEmail(email);
+
+      return {
+        isSuccess: true,
+      };
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @Post('/reset-password')
+    async resetPassword(@Body() resetPasswordDto: Record<string, any>) {
+      const {token, password} = resetPasswordDto;
+
+      if(!token || !password) {
+        throw new BadRequestException('token or password is required');
+      }
+
+      this.authService.resetPassword({token, password});
+      return {
+        success: true,
+      }
     }
 }

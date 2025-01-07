@@ -8,7 +8,13 @@ import { v4 as uuidv4 } from 'uuid';
 import LoginDto from "./dto/login.dto";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
-import { Public } from "src/shared/decorators/public.recorator";
+import { MailerService } from "@nestjs-modules/mailer";
+import { MailSubjects } from "@/shared/constants/mail.constant";
+import { TokenTypes } from "@/shared/constants/token-type";
+import { getActivationAccountEmailTemplate, getResetPasswordTemplate } from "@/shared/helpers/email-template";
+import { InjectRepository } from "@nestjs/typeorm";
+import User from "../user/entities/user.entity";
+import { ILike, Repository } from "typeorm";
 
 const GOOGLE_API_URL = 'https://www.googleapis.com/oauth2/v1/userinfo';
 @Injectable()
@@ -17,10 +23,20 @@ export class AuthService {
         private userService: UserService,
         @Inject('GOOGLE_OAUTH2_CLIENT') private oAuth2Client: OAuth2Client,
         private jwtService: JwtService,
+        private readonly mailerService: MailerService,
+        @InjectRepository(User) private readonly userRepository: Repository<User>,
     ) {}
 
-    async registerUser(dto: CreateUserDto): Promise<UserDto> {
-        return this.userService.save(dto);
+    async registerUser(dto: CreateUserDto) {
+        const data = {
+            ...dto,
+            activated: false,
+        }
+        
+        const user = await this.userService.save(data);
+
+        this.sendActivateEmail(user);
+        return this.generateTokePair({sub: user.id});
     };
 
     async validateGoogleLogin(token: string) {
@@ -82,10 +98,51 @@ export class AuthService {
             throw new UnauthorizedException('credentials are not valid');
         };
 
-        return this.generateTokePair({sub: user.id});
+        const {
+          password,
+          ...result
+        } = user;
+
+        return {
+
+        }
     }
 
-    private generateTokePair(payload) {
+    async verifyActivateToken(token: string) {
+        const payload = await this.jwtService.verifyAsync(token, {
+            secret: process.env.JWT_SECRET
+        });
+
+        const {
+            sub,
+            type,
+        } = payload;
+
+        const user = await this.userRepository.findOne({
+          where: {
+            id: sub,
+          }
+        });
+
+        if(!user) {
+            throw new NotFoundException('user not found');
+        };
+
+        if(user.activated) {
+            throw new BadRequestException('user is verified');
+        };
+
+        if(type !== TokenTypes.ACCOUNT_ACTIVATION) {
+            throw new BadRequestException('not valid token');
+        };
+
+        user.activated = true;
+        const savedData = this.userRepository.save(user);
+
+        return savedData;
+    }
+
+    generateTokePair(payload) {
         const accessToken = this.jwtService.sign(
         payload, {
             expiresIn: '2d'
@@ -104,5 +161,83 @@ export class AuthService {
         }
     };
 
+    async sendResetPasswordEmail(email: string) {
+      const user = await this.userRepository.findOne({
+        where: {
+          email: ILike(email),
+        }
+      });
 
+      if(!user) {
+        throw new NotFoundException('user not found');
+      }
+
+      const token = this.jwtService.sign({
+        sub: user.id,
+        type: TokenTypes.RESET_PASSWORD,
+      }, {
+        expiresIn: '10m',
+      });
+
+      this
+        .mailerService
+        .sendMail({
+            to: user.email,
+            subject: MailSubjects.ACTIVATE_ACCOUNT,
+            html: getResetPasswordTemplate({username: user.fullname, resetLink: `http://localhost:5173/reset-password?token=${token}`}),
+        });
+      
+        return true;
+   };
+
+    private async sendActivateEmail(user: UserDto) {
+
+        const verifyAccountToken = this.jwtService.sign(
+            {
+                sub: user.id,
+                type: TokenTypes.ACCOUNT_ACTIVATION,
+            }, {
+                expiresIn: '10m'
+            });
+        
+        this
+            .mailerService
+            .sendMail({
+                to: user.email,
+                subject: MailSubjects.ACTIVATE_ACCOUNT,
+                html: getActivationAccountEmailTemplate({username: user.fullname, activateLink: `http://localhost:5173/activate-account?token=${verifyAccountToken}`}),
+            })
+    }
+  
+    async resetPassword(resetPasswordDto: {
+      token: string,
+      password: string,
+    }) {
+      const {token, password} = resetPasswordDto;
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET
+      });
+      const {
+          sub,
+          type,
+      } = payload;
+
+      const user = await this.userRepository.findOne({
+        where: {
+          id: sub,
+        }
+      });
+
+      if(!user) {
+          throw new NotFoundException('user not found');
+      };
+
+      if(type !== TokenTypes.RESET_PASSWORD) {
+          throw new BadRequestException('not valid token');
+      };
+      user.password = await bcrypt.hash(password, 10);
+      
+      this.userRepository.save(user);
+      return true;
+    }
 }
