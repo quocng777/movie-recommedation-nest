@@ -207,4 +207,24 @@ export default class MovieService {
         } 
         : null;
     }
+
+    async getRatings(userId: number) {
+      const ratings = await this.ratingRepo.find({
+        where: {
+          user: {
+            id: userId
+          }
+        },
+        order: {
+          updatedAt: 'DESC'
+        }
+      });
+
+      return ratings
+                .map((rating) => ({
+                  id: rating.id,
+                  movieId: rating.movieId,
+                  score: rating.score,
+                }));
+    }
 };

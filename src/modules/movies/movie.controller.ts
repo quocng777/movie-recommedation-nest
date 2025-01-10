@@ -9,6 +9,7 @@ import MovieService from "./movie.service";
 import { UserDto } from "../user/dto/user.dto";
 import { ResponseMessage } from "@/shared/decorators/response-message.decorator";
 import { Auth } from "@/shared/decorators/auth.decorator";
+import { Request } from "express";
 
 @Controller('/movies')
 @Auth()
@@ -97,5 +98,11 @@ export class MovieController {
     async getRatingOfMovie(@Param('movieId') movieId: number, @Req() req) {
       const user = req.user as UserDto;
       return this.movieService.getRating(user.id, movieId);
+    }
+
+    @Get('/rating')
+    async getRatings(@Req() req: Request) {
+      const user = req.user as UserDto;
+      return this.movieService.getRatings(user.id);
     }
 };
