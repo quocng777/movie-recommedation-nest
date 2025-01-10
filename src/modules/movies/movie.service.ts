@@ -6,6 +6,7 @@ import { PaginationConfig, SortDirection } from "@/shared/constants/pagination";
 import PaginationResponse from "@/shared/types/pagination-response";
 import TmdbService from "../tmdb/tmdb.service";
 import WatchLater from "./entities/watch-later.entity";
+import Rating from "./entities/rating.entity";
 
 export interface MovieQueryOptions {
     page?: number;
@@ -21,6 +22,7 @@ export default class MovieService {
         @InjectRepository(LikedMovie) private readonly likedMovieRepo: Repository<LikedMovie>,
         private readonly tmdbService: TmdbService,
         @InjectRepository(WatchLater) private readonly watchLaterRepo: Repository<WatchLater>,
+        @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
     ) {}
 
     // async findLikedMoviesByUserId(userId: number, options?: MovieQueryOptions): Promise<PaginationResponse> {
@@ -140,12 +142,89 @@ export default class MovieService {
     }
 
     async removeFromWatchLater(userId: number, movieId: number) {
-
         const affected = (await this.watchLaterRepo.delete({user: {id: userId}, movieId})).affected;
         if(affected < 1) {
             throw new NotFoundException('Not found movie');
         }
 
         return affected;
+    }
+
+    async addRating(userId: number, movieId: number, score: number) {
+      const movie = await this.tmdbService.getMovieById(movieId);
+      if(!movie) {
+        throw new NotFoundException('movie not found');
+      }
+
+      await this.ratingRepo.delete({
+        movieId,
+        user: {
+          id: userId,
+        }
+      })
+      
+      const saved = await this.ratingRepo.save({
+        user: {
+          id: userId,
+        },
+        movieId,
+        score,
+      });
+
+      return {
+        id: saved.id,
+        movieId: saved.movieId,
+        score: saved.score,
+      };
+    }
+
+    async deleteRating(userId: number, movieId: number) {
+      await this.ratingRepo.delete({
+        movieId,
+        user: {
+          id: userId,
+        },
+      });
+
+      return true;
+    }
+    
+    async getRating(userId: number, movieId: number) {
+      const data = await this.ratingRepo.findOne({
+        where: {
+          movieId,
+          user: {
+            id: userId,
+          }
+        }
+      });
+
+      return data 
+        ? {
+          id: data.id,
+          movieId: data.movieId,
+          score: data.score,
+        } 
+        : null;
+    }
+
+    async getRatings(userId: number) {
+      const ratings = await this.ratingRepo.find({
+        where: {
+          user: {
+            id: userId
+          }
+        },
+        order: {
+          updatedAt: 'DESC'
+        }
+      });
+
+      return ratings
+                .map((rating) => ({
+                  id: rating.id,
+                  movieId: rating.movieId,
+                  score: rating.score,
+                }));
     }
 };

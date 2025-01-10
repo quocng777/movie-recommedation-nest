@@ -1,5 +1,5 @@
 import { HttpService } from "@nestjs/axios";
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, Res } from "@nestjs/common";
 import { Public } from "src/shared/decorators/public.recorator";
 import { HttpClient } from "src/shared/http/http-client/http-client";
 import { TmdbMovieDto } from "src/shared/tmdb/dtos/tmdb-movie.dto";
@@ -9,6 +9,7 @@ import MovieService from "./movie.service";
 import { UserDto } from "../user/dto/user.dto";
 import { ResponseMessage } from "@/shared/decorators/response-message.decorator";
 import { Auth } from "@/shared/decorators/auth.decorator";
+import { Request } from "express";
 
 @Controller('/movies')
 @Auth()
@@ -74,5 +75,34 @@ export class MovieController {
         const user = req.user as UserDto;
 
         return this.movieService.removeFromWatchLater(user.id, movieId);
+    }
+
+    @Post('/:movieId/rating')
+    async addMovieRating(
+      @Param('movieId') movieId: number, 
+      @Req() req, 
+      @Body() body: Record<string, any>) {
+      const {score} = body;
+      const user = req.user as UserDto;
+
+      return this.movieService.addRating(user.id, movieId, score);
+    }
+
+    @Delete('/:movieId/rating')
+    async removeMovieRating(@Param('movieId') movieId: number, @Req() req) {
+      const user = req.user as UserDto;
+      return this.movieService.deleteRating(user.id, movieId);
+    }
+
+    @Get('/:movieId/rating')
+    async getRatingOfMovie(@Param('movieId') movieId: number, @Req() req) {
+      const user = req.user as UserDto;
+      return this.movieService.getRating(user.id, movieId);
+    }
+
+    @Get('/rating')
+    async getRatings(@Req() req: Request) {
+      const user = req.user as UserDto;
+      return this.movieService.getRatings(user.id);
     }
 };

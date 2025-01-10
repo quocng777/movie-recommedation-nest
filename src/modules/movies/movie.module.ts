@@ -5,9 +5,10 @@ import LikedMovie from "./entities/liked-movie.entity";
 import MovieService from "./movie.service";
 import { TmdbModule } from "../tmdb/tmdb.module";
 import WatchLater from "./entities/watch-later.entity";
+import Rating from "./entities/rating.entity";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([LikedMovie, WatchLater]), TmdbModule],
+    imports: [TypeOrmModule.forFeature([LikedMovie, WatchLater, Rating]), TmdbModule],
     controllers: [MovieController],
     providers: [MovieService],
 })
