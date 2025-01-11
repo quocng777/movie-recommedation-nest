@@ -24,7 +24,7 @@ import { mailerOptions } from './config/mailer.config';
       http: process.env.NODE_ENV !== 'production',
     }),
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     JwtModule.registerAsync({
@@ -34,20 +34,19 @@ import { mailerOptions } from './config/mailer.config';
         return {
           secret: process.env.JWT_SECRET,
           signOptions: {
-            expiresIn: 8 * 60 * 10000000
-          }
-        }
+            expiresIn: 8 * 60 * 10000000,
+          },
+        };
       },
-      global: true
+      global: true,
     }),
     MailerModule.forRoot(mailerOptions),
     {
       ...HttpModule.registerAsync({
         useClass: HttpConfigService,
       }),
-      global: true
-    }
-    ,
+      global: true,
+    },
     HttpClientModule,
     UserModule,
     AuthModule,

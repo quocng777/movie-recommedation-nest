@@ -1,5 +1,5 @@
 import { HttpService } from "@nestjs/axios";
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, Query, Req, Res } from "@nestjs/common";
 import { Public } from "src/shared/decorators/public.recorator";
 import { HttpClient } from "src/shared/http/http-client/http-client";
 import { TmdbMovieDto } from "src/shared/tmdb/dtos/tmdb-movie.dto";
@@ -104,5 +104,47 @@ export class MovieController {
     async getRatings(@Req() req: Request) {
       const user = req.user as UserDto;
       return this.movieService.getRatings(user.id);
+    }
+
+    @Public()
+    @Get('/:movieId/reviews')
+    @HttpCode(HttpStatus.OK)
+    async getReviewsByMovie(@Param('movieId') movieId: number) {
+      return this.movieService.getReviews(movieId);
+    }
+
+    @Public()
+    @Get('/:movieId/reviews/latest')
+    @HttpCode(HttpStatus.OK)
+    async getLatestReviewsByMovie(@Param('movieId') movieId: number, @Query('limit') limit: number) {
+      if (isNaN(limit)) {
+        limit = 1;
+      }
+      return this.movieService.getLatestReviews(movieId, limit);
+    }
+
+    @Post('/:movieId/reviews')
+    @HttpCode(HttpStatus.CREATED)
+    async addReviewToMovie(@Param('movieId') movieId: number, @Req() req, @Body() body: Record<string, any>) {
+      const user = req.user as UserDto;
+      const { comment } = body;
+
+      return this.movieService.addReview(movieId, user.id, comment);
+    }
+
+    @Patch('/:movieId/reviews/:reviewId')
+    @HttpCode(HttpStatus.OK)
+    async editReviewOfMovie(@Param('movieId') movieId: number, @Param('reviewId') reviewId: number, @Req() req, @Body() body: Record<string, any>) {
+      const user = req.user as UserDto;
+      const { comment } = body;
+
+      return this.movieService.updateReview(reviewId, movieId, user.id, comment);
+    }
+
+    @Delete('/:movieId/reviews/:reviewId')
+    @HttpCode(HttpStatus.OK)
+    async deleteReviewOfMovie(@Param('movieId') movieId: number, @Param('reviewId') reviewId: number, @Req() req) {
+      const user = req.user as UserDto;
+      return this.movieService.deleteReview(reviewId, movieId, user.id);
     }
 };
