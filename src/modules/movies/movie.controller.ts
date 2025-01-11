@@ -147,10 +147,4 @@ export class MovieController {
       const user = req.user as UserDto;
       return this.movieService.deleteReview(reviewId, movieId, user.id);
     }
-
-    @Get('/:movieId/reviews/count')
-    @HttpCode(HttpStatus.OK)
-    async getReviewCount(@Param('movieId') movieId: number) {
-      return this.movieService.getReviewCount(movieId);
-    }
 };

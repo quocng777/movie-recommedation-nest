@@ -17,7 +17,6 @@ import { dataSourceOptions } from './config/typeorm.config';
 import PlaylistModule from './modules/playlist/playlist.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { mailerOptions } from './config/mailer.config';
-import { ReviewModule } from './modules/review/review.module';
 
 @Module({
   imports: [
@@ -54,7 +53,6 @@ import { ReviewModule } from './modules/review/review.module';
     MovieModule,
     TmdbModule,
     PlaylistModule,
-    ReviewModule,
   ],
   providers: [
     {

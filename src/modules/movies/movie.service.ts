@@ -239,11 +239,16 @@ export default class MovieService {
         order: { created_at: 'DESC' },
       });
 
+      const total = await this.reviewRepo.count({ where: { movie_id: movieId } });
       const userMini = plainToInstance(UserMiniDto, reviews.map((review) => review.user), { excludeExtraneousValues: true });
-      return reviews.map((review, index) => ({
-        ...review,
-        user: userMini[index],
-      }));
+
+      return {
+        reviews: reviews.map((review, index) => ({
+          ...review,
+          user: userMini[index],
+        })),
+        total,
+      }
     }
 
     async getLatestReviews(movieId: number, limit: number) {
@@ -254,12 +259,16 @@ export default class MovieService {
         take: limit,
       });
 
+      const total = await this.reviewRepo.count({ where: { movie_id: movieId } });
       const userMini = plainToInstance(UserMiniDto, reviews.map((review) => review.user), { excludeExtraneousValues: true });
       
-      return reviews.map((review, index) => ({
-        ...review,
-        user: userMini[index],
-      }));
+      return {
+        reviews: reviews.map((review, index) => ({
+          ...review,
+          user: userMini[index],
+        })),
+        total,
+      }
     }
 
     async addReview(movieId: number, userId: number, comment: string) {
@@ -319,9 +328,5 @@ export default class MovieService {
 
       await this.reviewRepo.remove(review);
       return reviewId;
-    }
-
-    async getReviewCount(movieId: number) {
-      return this.reviewRepo.count({ where: { movie_id: movieId } });
     }
 };
