@@ -9,4 +9,14 @@ export class AiController {
   async getAiNavigation(@Query('query') query: string) {
     return this.aiService.navigate(query);
   } 
+
+  @Get('/retriever')
+  async getRetriever(
+    @Query('collectionName') collectionName: string,
+    @Query('query') query: string,
+    @Query('amount') amount: number = 10,
+    @Query('threshold') threshold: number = 0.25,
+  ) {
+    return this.aiService.retrieveMovies(collectionName, query, amount, threshold);
+  }
 }

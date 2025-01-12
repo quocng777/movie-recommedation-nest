@@ -108,4 +108,30 @@ export class AiService {
 
     return data.data;
   }
+
+  async retrieveMovies(collectionName: string, query: string, amount: number = 10, threshold: number = 0.25) {
+    const url = `https://awd-llm.azurewebsites.net/retriever/`;
+    const params = {
+      llm_api_key: this.llmApiKey,
+      collection_name: collectionName,
+      query,
+      amount,
+      threshold,
+    };
+
+    try {
+      const res = this.httpService.get(url, { params }).pipe(
+        catchError((error: AxiosError) => {
+          console.error('Error retrieving movies:', error.message);
+          throw new InternalServerErrorException('Failed to retrieve movies');
+        }),
+      );
+
+      const { data } = await firstValueFrom(res);
+      return data; // Trả về kết quả từ API
+    } catch (error) {
+      console.error('Error in retrieveMovies:', error);
+      throw new InternalServerErrorException('Failed to process retrieveMovies');
+    }
+  }
 }
