@@ -17,6 +17,7 @@ import { dataSourceOptions } from './config/typeorm.config';
 import PlaylistModule from './modules/playlist/playlist.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { mailerOptions } from './config/mailer.config';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { mailerOptions } from './config/mailer.config';
     MovieModule,
     TmdbModule,
     PlaylistModule,
+    AiModule,
   ],
   providers: [
     {
