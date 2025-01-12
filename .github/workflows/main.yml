@@ -28,13 +28,14 @@ jobs:
       - name: Build and test
         # Build và test image được build ra bằng Docker 
         run: |
-          docker build -t karl .
+          docker build -t karl . -f Dockerfile.prod
 
       - name: Push image to Docker Hub
         uses: docker/build-push-action@v2
         # Sử dụng action "docker/build-push-action" để đẩy image lên Docker Hub
         with:
-          context: .
+          context: . 
+          file: Dockerfile.prod 
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/karl:${{ github.sha }}
 
@@ -51,6 +52,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE }}
+          port: 22
           script: |
               # Pull image mà được push lên DockerHub bên trên
               docker pull ${{ secrets.DOCKER_USERNAME }}/karl:${{ github.sha }}
