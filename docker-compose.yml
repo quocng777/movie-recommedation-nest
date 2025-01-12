@@ -12,5 +12,24 @@ services:
       - postgres-data:/var/lib/postgres/data
     ports:
       - '5432:5432'
+    networks:
+      - app-network 
+  server:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE:-Dockerfile.prod}
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - postgres
+
+networks:
+  app-network:
+    driver: bridge
+
 volumes:
   postgres-data:

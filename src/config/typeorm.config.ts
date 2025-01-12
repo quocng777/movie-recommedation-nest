@@ -8,7 +8,13 @@ import PlaylistItem from "@/modules/playlist/entities/playlist-item.entity";
 import Rating from "@/modules/movies/entities/rating.entity";
 import Review from "@/modules/movies/entities/review.entity";
 
-dotenvConfig();
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+dotenvConfig(
+  {
+    path: nodeEnv !== 'production' ? '.env' : `.env.${nodeEnv}`
+  }
+);
 
 export const dataSourceOptions: DataSourceOptions = {
     synchronize: false,
