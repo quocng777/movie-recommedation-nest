@@ -20,6 +20,7 @@ import { mailerOptions } from './config/mailer.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { mongooseConfig } from './config/mongoose.config';
 import { AiModule } from './modules/ai/ai.module';
+import { MovieGenresModule } from './modules/movie-genres/movie-genres.module';
 
 @Module({
   imports: [ 
@@ -60,6 +61,8 @@ import { AiModule } from './modules/ai/ai.module';
     TmdbModule,
     PlaylistModule,
     AiModule,
+    MovieGenresModule,
+    
   ],
   providers: [
     {
