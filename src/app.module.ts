@@ -19,6 +19,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { mailerOptions } from './config/mailer.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { mongooseConfig } from './config/mongoose.config';
+import { AiModule } from './modules/ai/ai.module';
+
 @Module({
   imports: [ 
     DevtoolsModule.register({
@@ -56,7 +58,7 @@ import { mongooseConfig } from './config/mongoose.config';
     MovieModule,
     TmdbModule,
     PlaylistModule,
-    
+    AiModule,
   ],
   providers: [
     {
