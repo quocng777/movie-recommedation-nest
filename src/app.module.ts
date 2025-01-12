@@ -27,6 +27,7 @@ import { AiModule } from './modules/ai/ai.module';
       http: process.env.NODE_ENV !== 'production',
     }),
     ConfigModule.forRoot({
+      envFilePath: `${process.env.NODE_ENV != 'production' ? '.env' : `.env.${process.env.NODE_ENV}`}`,
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
