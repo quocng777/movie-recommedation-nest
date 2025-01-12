@@ -71,4 +71,5 @@ jobs:
                 -e MAIL_FROM="${{ secrets.MAIL_FROM }}" \
                 -e LLM_BASE_URL="${{ secrets.LLM_BASE_URL }}" \
                 -e LLM_API_KEY="${{ secrets.LLM_API_KEY }}" \
+                -e MONGO_URI="${{ secrets.MONGO_URI }}" \
                 ${{ secrets.DOCKER_USERNAME }}/karl:${{ github.sha }}
