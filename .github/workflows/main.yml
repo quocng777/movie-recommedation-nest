@@ -1,0 +1,86 @@
+name: Docker CI/CD Pipeline
+
+# Xác định sự kiện trigger cho pipeline, trong trường hợp này là push lên nhánh develop
+on:
+  push:
+    branches:
+      - main
+
+# Định nghĩa các jobs cần thực hiện 
+jobs:
+   # Job 1: build và test
+   # Job thực thi trên máy ảo ubuntu
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        # Sử dụng action "checkout" để sao copy code từ repository vào máy ảo Ubuntu
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+          # Sử dụng action "docker/login-action" để đăng nhập vào Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Build and test
+        # Build và test image được build ra bằng Docker 
+        run: |
+          docker build -t karl .
+
+      - name: Push image to Docker Hub
+        uses: docker/build-push-action@v2
+        # Sử dụng action "docker/build-push-action" để đẩy image lên Docker Hub
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/karl:${{ github.sha }}
+
+ # Job 2: Deploy
+  deploy:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+       # Sử dụng action "appleboy/ssh-action" để triển khai image lên server thông qua SSH
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE }}
+          script: |
+              # Pull image mà được push lên DockerHub bên trên
+              docker pull ${{ secrets.DOCKER_USERNAME }}/karl:${{ github.sha }}
+
+              # Dừng và gỡ bỏ container hiện tại (nếu có)
+              docker stop karl-container
+              docker rm karl-container 
+              docker run -d -p 80:3000 --name karl-container \
+                -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+                -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+                -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+                -e DB_HOST=${{ secrets.DB_HOST }} \
+                -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+                -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                -e DB_DATABASE=${{ secrets.DB_DATABASE }} \
+                -e DB_PORT=${{ secrets.DB_PORT }} \
+                -e ENDPOINT_PREFIX=${{ secrets.ENDPOINT_PREFIX }} \
+                -e CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
+                -e OAUTH2_GOOGLE_CLIENT_ID=${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }} \
+                -e OAUTH2_GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }} \
+                -e OAUTH_CALLBACK_URL=${{ secrets.OAUTH_CALLBACK_URL }} \
+                -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+                -e TMDB_ACCESS_TOKEN=${{ secrets.TMDB_ACCESS_TOKEN }} \
+                -e TMDB_API_KEY=${{ secrets.TMDB_API_KEY }} \
+                -e TMDB_API_BASE_URL=${{ secrets.TMDB_API_BASE_URL }} \
+                -e MAIL_HOST=${{ secrets.MAIL_HOST }} \
+                -e MAIL_PORT=${{ secrets.MAIL_PORT }} \
+                -e MAIL_USER=${{ secrets.MAIL_USER }} \
+                -e MAIL_PASS=${{ secrets.MAIL_PASS }} \
+                -e MAIL_FROM=${{ secrets.MAIL_FROM }} \
+                -e LLM_BASE_URL=${{ secrets.LLM_BASE_URL }} \
+                -e LLM_API_KEY=${{ secrets.LLM_API_KEY }}\               
+                ${{secrets.DOCKER_USERNAME}}/karl:${{ github.sha }}
