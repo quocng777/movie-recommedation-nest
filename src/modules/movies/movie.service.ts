@@ -10,7 +10,9 @@ import Rating from "./entities/rating.entity";
 import Review from "./entities/review.entity";
 import { plainToInstance } from "class-transformer";
 import { UserMiniDto } from "../user/dto/user-mini.dto";
-
+import { Movie } from "./schemas/movie.schema";
+import { Model } from "mongoose";
+import { InjectModel } from "@nestjs/mongoose";
 export interface MovieQueryOptions {
     page?: number;
     limit?: number;
@@ -22,11 +24,13 @@ export interface MovieQueryOptions {
 @Injectable()
 export default class MovieService {
     constructor(
-        @InjectRepository(LikedMovie) private readonly likedMovieRepo: Repository<LikedMovie>,
         private readonly tmdbService: TmdbService,
+        @InjectModel('movies') private readonly movieModel: Model<Movie>,
+        @InjectRepository(LikedMovie) private readonly likedMovieRepo: Repository<LikedMovie>,
         @InjectRepository(WatchLater) private readonly watchLaterRepo: Repository<WatchLater>,
         @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
         @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
+        
     ) {}
 
     // async findLikedMoviesByUserId(userId: number, options?: MovieQueryOptions): Promise<PaginationResponse> {
@@ -54,7 +58,15 @@ export default class MovieService {
     //         }
     //     };
     // }
-
+    async getMovie(movieId: string) {
+        const movie = await this.movieModel.findById(movieId);
+        if (!movie) {
+          throw new Error('Movie not found');  
+        } 
+      
+        return movie;
+      }
+      
     async findLikedMoviesByUserId(userId: number) {
         const likedMovieIds = await this.likedMovieRepo.findAndCount({
             where: {

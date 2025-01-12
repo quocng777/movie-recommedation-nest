@@ -17,9 +17,10 @@ import { dataSourceOptions } from './config/typeorm.config';
 import PlaylistModule from './modules/playlist/playlist.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { mailerOptions } from './config/mailer.config';
-
+import { MongooseModule } from '@nestjs/mongoose';
+import { mongooseConfig } from './config/mongoose.config';
 @Module({
-  imports: [
+  imports: [ 
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
     }),
@@ -27,6 +28,8 @@ import { mailerOptions } from './config/mailer.config';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    MongooseModule.forRoot(mongooseConfig.uri),
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -53,6 +56,7 @@ import { mailerOptions } from './config/mailer.config';
     MovieModule,
     TmdbModule,
     PlaylistModule,
+    
   ],
   providers: [
     {
@@ -64,5 +68,5 @@ import { mailerOptions } from './config/mailer.config';
     //   useClass: JwtAuthGuard,
     // }
   ],
-})
+}) 
 export class AppModule {}
