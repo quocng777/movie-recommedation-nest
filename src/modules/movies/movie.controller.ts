@@ -32,10 +32,7 @@ export class MovieController {
     private readonly movieService: MovieService,
   ) {}
 
-  @Get('/:id')
-  async getMovie(@Param('id') id: string) {
-    return this.movieService.getMovie(id);
-  }
+  
 
   @Public()
   @Get('/trending')
@@ -51,6 +48,7 @@ export class MovieController {
 
   @Get('/liked')
   async getLikedMovies(@Req() req) {
+    console.log("Check" + req);
     const user = req.user as UserDto;
     return this.movieService.findLikedMoviesByUserId(user.id);
   }
@@ -186,5 +184,9 @@ export class MovieController {
   ) {
     const user = req.user as UserDto;
     return this.movieService.deleteReview(reviewId, movieId, user.id);
+  }
+  @Get('/movie/:id')
+  async getMovie(@Param('id') id: string) {
+    return this.movieService.getMovie(id);
   }
 }

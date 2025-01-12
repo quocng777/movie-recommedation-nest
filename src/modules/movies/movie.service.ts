@@ -25,12 +25,12 @@ export interface MovieQueryOptions {
 export default class MovieService {
     constructor(
         private readonly tmdbService: TmdbService,
-        @InjectModel('movies') private readonly movieModel: Model<Movie>,
         @InjectRepository(LikedMovie) private readonly likedMovieRepo: Repository<LikedMovie>,
         @InjectRepository(WatchLater) private readonly watchLaterRepo: Repository<WatchLater>,
         @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
         @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
-        
+        @InjectModel('movies') private readonly movieModel: Model<Movie>,
+
     ) {}
 
     // async findLikedMoviesByUserId(userId: number, options?: MovieQueryOptions): Promise<PaginationResponse> {
@@ -62,12 +62,13 @@ export default class MovieService {
         const movie = await this.movieModel.findById(movieId);
         if (!movie) {
           throw new Error('Movie not found');  
-        } 
+        }
       
         return movie;
       }
       
     async findLikedMoviesByUserId(userId: number) {
+        console.log("Check" + userId)
         const likedMovieIds = await this.likedMovieRepo.findAndCount({
             where: {
                 user: {id: userId},
@@ -76,7 +77,7 @@ export default class MovieService {
                 createdAt: SortDirection.DESC
             },
         });
-
+        console.log(likedMovieIds)
         const data = likedMovieIds[0].map((movie) => movie.movieId);
 
         return data;

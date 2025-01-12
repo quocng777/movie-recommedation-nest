@@ -12,7 +12,7 @@ export class AiController {
 
   @Get('/retriever')
   async getRetriever(
-    @Query('collectionName') collectionName: string,
+    @Query('collection_name') collectionName: string,
     @Query('query') query: string,
     @Query('amount') amount: number = 10,
     @Query('threshold') threshold: number = 0.25,

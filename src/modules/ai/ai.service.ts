@@ -74,7 +74,7 @@ export class AiService {
           "original_language": "fr",
           "genre_ids": [
             28,
-            35
+            35 
           ],
           "popularity": 44.516,
           "release_date": "2025-01-10",
@@ -118,20 +118,22 @@ export class AiService {
       amount,
       threshold,
     };
-
+  
     try {
+      
       const res = this.httpService.get(url, { params }).pipe(
         catchError((error: AxiosError) => {
           console.error('Error retrieving movies:', error.message);
           throw new InternalServerErrorException('Failed to retrieve movies');
         }),
       );
-
       const { data } = await firstValueFrom(res);
-      return data; // Trả về kết quả từ API
+
+      return data; 
     } catch (error) {
       console.error('Error in retrieveMovies:', error);
       throw new InternalServerErrorException('Failed to process retrieveMovies');
     }
   }
+  
 }
