@@ -3,8 +3,6 @@ import { Document } from 'mongoose';
 
 @Schema({ collection: 'movie_genres' }) 
 export class MovieGenre extends Document {
-  @Prop({ type: String, required: true })
-  _id: string; 
 
   @Prop({ type: Number, required: true })
   tmdb_id: number;

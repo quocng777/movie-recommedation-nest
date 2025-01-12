@@ -21,6 +21,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { mongooseConfig } from './config/mongoose.config';
 import { AiModule } from './modules/ai/ai.module';
 import { MovieGenresModule } from './modules/movie-genres/movie-genres.module';
+import { PeopleModule } from './modules/people/people.module';
 
 @Module({
   imports: [ 
@@ -62,6 +63,7 @@ import { MovieGenresModule } from './modules/movie-genres/movie-genres.module';
     PlaylistModule,
     AiModule,
     MovieGenresModule,
+    PeopleModule,
     
   ],
   providers: [
