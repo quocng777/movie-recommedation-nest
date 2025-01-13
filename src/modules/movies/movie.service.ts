@@ -61,7 +61,7 @@ export default class MovieService {
     //     };
     // }
     async getMovie(movieId: string) {
-        const movie = await this.movieRepo.find({ where: { _id: movieId } });  // Sửa cú pháp ở đây
+        const movie = await this.movieRepo.find({ where: { id: movieId } });  // Sửa cú pháp ở đây
         if (!movie || movie.length === 0) {  // Kiểm tra nếu không có movie nào trả về
             throw new Error('Movie not found');  
         }
