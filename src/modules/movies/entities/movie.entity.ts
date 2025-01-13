@@ -55,6 +55,6 @@ export class Movie {
   @Column('varchar', { nullable: true })
   keywords: string[];
 
-  @OneToMany(() => Movies_Casts_Combined, (movie_cast) => movie_cast.movie_id)
+  @OneToMany(() => Movies_Casts_Combined, (movie_cast) => movie_cast.movie)
   movie_cast: Movies_Casts_Combined[]; // Danh sách review liên kết với bộ phim
 }

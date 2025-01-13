@@ -20,7 +20,7 @@ dotenvConfig(
 );
 
 export const dataSourceOptions: DataSourceOptions = {
-    synchronize: false,
+    synchronize: true,
     type: 'postgres',
     host: process.env.DB_HOST,
     username: process.env.DB_USERNAME,
