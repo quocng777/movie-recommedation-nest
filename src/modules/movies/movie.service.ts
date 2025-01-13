@@ -355,6 +355,7 @@ export default class MovieService {
         backdrop_path: movie.backdrop_path,
         title: movie.title,
         original_title: movie.original_title,
+        original_language: movie.original_language,
         tagline: movie.tagline,
         release_date: movie.release_date,
         budget: movie.budget,
@@ -364,11 +365,12 @@ export default class MovieService {
         video: movie.video,
         status: movie.status,
         poster_path: movie.poster_path,
-        genres: movie.genres.map((genre) => genre.id),
+        genre_ids: movie.genres.map((genre) => genre.id),
+        genres: movie.genres.map((genre) => ({
+          id: genre.id,
+          name: genre.name,
+        })),
         overview: movie.overview,
-        // trailers: [],
-        // keywords: [],
-        // movie_cast: [],
       }));
     }
 };

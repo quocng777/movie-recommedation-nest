@@ -50,6 +50,7 @@ export interface IMovie extends Document {
   genres: IGenre[];
   homepage: string;
   original_title: string;
+  original_language: string;
   overview: string;
   popularity: number;
   poster_path: string;
@@ -80,6 +81,7 @@ export const MovieSchema = new Schema<IMovie>(
     ],
     homepage: { type: String, required: false },
     original_title: { type: String, required: true },
+    original_language: { type: String, required: true },
     overview: { type: String, required: true },
     popularity: { type: Number, required: true },
     poster_path: { type: String, required: true },

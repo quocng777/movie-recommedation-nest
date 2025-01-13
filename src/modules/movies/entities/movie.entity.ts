@@ -17,6 +17,9 @@ export class Movie {
   @Column('varchar', { length: 255, nullable: true })
   original_title: string;
 
+  @Column('varchar', { length: 255, nullable: true })
+  original_language: string;
+
   @Column('text', { nullable: true })
   tagline: string;
 
@@ -45,7 +48,7 @@ export class Movie {
   poster_path: string;
 
   @Column('int', { array: true, nullable: true })
-  genres: number[]; 
+  genre_ids: number[]; 
 
   @Column('varchar', { array: true, nullable: true })
   trailers: string[]; 

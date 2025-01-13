@@ -193,6 +193,7 @@ export class MovieController {
   @Public()
   @Get('/get-with-objectids')
   async getTmdbMovie(@Query('objectIds') objectIds: string) {
+    console.log(objectIds);
     const idsArray = objectIds.split(',');
     return this.movieService.getMoviesWithObjectIds(idsArray);
   }
