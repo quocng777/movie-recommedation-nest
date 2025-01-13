@@ -5,7 +5,7 @@ import { ConfigService } from "@nestjs/config";
 import { catchError, firstValueFrom } from "rxjs";
 import { AxiosError } from "axios";
 import { InjectModel } from "@nestjs/mongoose";
-import { Movie } from "../movies/schemas/movie.schema";
+import { IMovie } from "../movies/schemas/movie.schema";
 import { Model } from "mongoose";
 import { NavigationResponse, NavigationRoute } from "./interfaces/navigation-response.interface";
 
@@ -14,7 +14,7 @@ export class AiService {
   private readonly llmApiKey: string;
   constructor(private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    @InjectModel("movies") private movieModel: Model<Movie>,
+    @InjectModel("movies") private movieModel: Model<IMovie>,
   ) {
     this.llmApiKey = configService.get('LLM_API_KEY');
   }
@@ -35,17 +35,19 @@ export class AiService {
       );
 
     const { data } = await firstValueFrom(res);
-    
-    // just for test
+
     if(data.data.route === NavigationRoute.CAST_PAGE && data.data.params) {
-      data.data.params = (await this.movieModel.find({ _id: { $in: data.data.params.movie_ids } }).exec()).flat();
-
-      if(data.data.params.length === 0) {
+      const movies = await this.movieModel.find({ _id: { $in: data.data.params.movie_ids } });
+      
+      if (movies.length === 0) {
         data.data.route = NavigationRoute.NONE;
+        data.data.params = null;
+      } else {
+        data.data.params = movies.map((movie: IMovie) => {
+          return movie.tmdb_id;
+        });
       }
-    }
-
-    if(!data.data.params) {
+    } else if(!data.data.params) {
       data.data.route = NavigationRoute.NONE;
     }
 
