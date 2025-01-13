@@ -1,7 +1,31 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
-@Entity('movie_cast_combined') // Tên bảng là "users"
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+} from 'typeorm';
+import { Movie } from './movie.entity';
+import { Person } from '@/modules/person/entities/person.entity';
+@Entity('movie_cast_combined')
 export class Movies_Casts_Combined {
-    @PrimaryColumn('varchar', { length: 24 })
-    id: string; 
-    
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ManyToOne(() => Movie, (movie) => movie.movie_cast, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
+  movie_id: string;
+  @ManyToOne(() => Person, (person) => person.movie_cast, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
+  cast_id: string;
+
+  @Column('varchar', { nullable: false })
+  name: string;
+
+  @Column('varchar', { nullable: false })
+  profile_image: string;
 }

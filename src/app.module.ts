@@ -20,7 +20,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { mongooseConfig } from './config/mongoose.config';
 import { AiModule } from './modules/ai/ai.module';
 import { MovieModule } from './modules/movies/movie.module';
-import { PeopleModule } from './modules/people/people.module';
+import { PersonModule } from './modules/person/person.module';
 
 @Module({
   imports: [ 
@@ -61,7 +61,7 @@ import { PeopleModule } from './modules/people/people.module';
     PlaylistModule,
     AiModule,
     MovieModule,
-    PeopleModule
+    PersonModule
   ],
   providers: [
     {

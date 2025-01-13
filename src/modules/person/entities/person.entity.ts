@@ -1,5 +1,7 @@
 import { PrimaryColumn, Column } from 'typeorm';
-export class People {
+import { OneToMany } from 'typeorm';
+import { Movies_Casts_Combined } from '@/modules/movies/entities/movie-cast-combined.entity';
+export class Person {
   @PrimaryColumn('int')
   id: string;
 
@@ -40,4 +42,7 @@ export class People {
   popularity: string;
   @Column('varchar', { nullable: true })
   profile_path: string;
+
+    @OneToMany(() => Movies_Casts_Combined, (movie_cast) => movie_cast.cast_id)
+    movie_cast: Movies_Casts_Combined[]; // Danh sách review liên kết với bộ phim
 }
