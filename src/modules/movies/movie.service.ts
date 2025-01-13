@@ -10,9 +10,9 @@ import Rating from "./entities/rating.entity";
 import Review from "./entities/review.entity";
 import { plainToInstance } from "class-transformer";
 import { UserMiniDto } from "../user/dto/user-mini.dto";
-import { Movie } from "./schemas/movie.schema";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
+import { Movie } from "./entities/movie.entity";
 export interface MovieQueryOptions {
     page?: number;
     limit?: number;
@@ -29,7 +29,9 @@ export default class MovieService {
         @InjectRepository(WatchLater) private readonly watchLaterRepo: Repository<WatchLater>,
         @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
         @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
-        @InjectModel('movies') private readonly movieModel: Model<Movie>,
+        @InjectRepository(Movie) private readonly movieRepo: Repository<Movie>,
+
+        // @InjectModel('movies') private readonly movieModel: Model<Movie>,
 
     ) {}
 
@@ -59,13 +61,13 @@ export default class MovieService {
     //     };
     // }
     async getMovie(movieId: string) {
-        const movie = await this.movieModel.findById(movieId);
-        if (!movie) {
-          throw new Error('Movie not found');  
+        const movie = await this.movieRepo.find({ where: { _id: movieId } });  // Sửa cú pháp ở đây
+        if (!movie || movie.length === 0) {  // Kiểm tra nếu không có movie nào trả về
+            throw new Error('Movie not found');  
         }
-      
-        return movie;
-      }
+        return movie[0];  // Giả sử chỉ có một bộ phim được tìm thấy
+    }
+    
       
     async findLikedMoviesByUserId(userId: number) {
         console.log("Check" + userId)
