@@ -29,9 +29,9 @@ export default class MovieService {
         @InjectRepository(WatchLater) private readonly watchLaterRepo: Repository<WatchLater>,
         @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
         @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
-        @InjectRepository(Movie) private readonly movieRepo: Repository<Movie>,
-
-        // @InjectModel('movies') private readonly movieModel: Model<Movie>,
+        // @InjectRepository(Movie) private readonly movieRepo: Repository<Movie>,
+  
+        @InjectModel('movies') private readonly movieModel: Model<Movie>,
 
     ) {}
 
@@ -61,11 +61,11 @@ export default class MovieService {
     //     };
     // }
     async getMovie(movieId: string) {
-        const movie = await this.movieRepo.find({ where: { id: movieId } });  // Sửa cú pháp ở đây
-        if (!movie || movie.length === 0) {  // Kiểm tra nếu không có movie nào trả về
+        const movie = await this.movieModel.findById(movieId).exec();
+        if (!movie ) {  
             throw new Error('Movie not found');  
         }
-        return movie[0];  // Giả sử chỉ có một bộ phim được tìm thấy
+        return movie;  
     }
     
       
