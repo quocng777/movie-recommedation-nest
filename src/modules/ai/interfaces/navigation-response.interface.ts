@@ -1,6 +1,8 @@
 export enum NavigationRoute {
   SEARCH_PAGE = 'SEARCH_PAGE',
   CAST_PAGE = 'CAST_PAGE',
+  MOVIE_PAGE = 'MOVIE_PAGE',
+  GENRE_PAGE = 'GENRE_PAGE',
   NONE = 'NONE',
 }
 
