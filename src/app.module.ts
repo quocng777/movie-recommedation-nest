@@ -10,7 +10,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './shared/guards/jwt.guard';
 import { HttpModule } from '@nestjs/axios';
 import { HttpConfigService } from './config/http.config';
-import { MovieModule } from './modules/movies/movie.module';
 import { HttpClientModule } from './shared/http/http-client/http-client-module';
 import { TmdbModule } from './modules/tmdb/tmdb.module';
 import { dataSourceOptions } from './config/typeorm.config';
@@ -20,6 +19,8 @@ import { mailerOptions } from './config/mailer.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { mongooseConfig } from './config/mongoose.config';
 import { AiModule } from './modules/ai/ai.module';
+import { MovieModule } from './modules/movies/movie.module';
+import { PersonModule } from './modules/person/person.module';
 
 @Module({
   imports: [ 
@@ -56,10 +57,11 @@ import { AiModule } from './modules/ai/ai.module';
     HttpClientModule,
     UserModule,
     AuthModule,
-    MovieModule,
     TmdbModule,
     PlaylistModule,
     AiModule,
+    MovieModule,
+    PersonModule
   ],
   providers: [
     {
