@@ -32,8 +32,6 @@ export class MovieController {
     private readonly movieService: MovieService,
   ) {}
 
-  
-
   @Public()
   @Get('/trending')
   async getTrendingMovie() {
@@ -48,7 +46,7 @@ export class MovieController {
 
   @Get('/liked')
   async getLikedMovies(@Req() req) {
-    console.log("Check" + req);
+    console.log('Check' + req);
     const user = req.user as UserDto;
     return this.movieService.findLikedMoviesByUserId(user.id);
   }
@@ -185,8 +183,17 @@ export class MovieController {
     const user = req.user as UserDto;
     return this.movieService.deleteReview(reviewId, movieId, user.id);
   }
+
   @Get('/movie/:id')
   async getMovie(@Param('id') id: string) {
     return this.movieService.getMovie(id);
+  }
+
+  // Dark magic :))
+  @Public()
+  @Get('/get-with-objectids')
+  async getTmdbMovie(@Query('objectIds') objectIds: string) {
+    const idsArray = objectIds.split(',');
+    return this.movieService.getMoviesWithObjectIds(idsArray);
   }
 }

@@ -61,7 +61,7 @@ import { PersonModule } from './modules/person/person.module';
     PlaylistModule,
     AiModule,
     MovieModule,
-    PersonModule
+    PersonModule,
   ],
   providers: [
     {
@@ -73,5 +73,5 @@ import { PersonModule } from './modules/person/person.module';
     //   useClass: JwtAuthGuard,
     // }
   ],
-}) 
+})
 export class AppModule {}

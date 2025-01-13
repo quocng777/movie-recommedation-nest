@@ -32,5 +32,8 @@ import {
   
     @Column('varchar', { nullable: false })
     profile_image: string;
+
+    @Column('varchar', { nullable: false })
+    character: string;
   }
   

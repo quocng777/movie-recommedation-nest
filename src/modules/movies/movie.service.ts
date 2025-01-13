@@ -13,6 +13,7 @@ import { UserMiniDto } from "../user/dto/user-mini.dto";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { Movie } from "./entities/movie.entity";
+import { IMovie } from "./schemas/movie.schema";
 export interface MovieQueryOptions {
     page?: number;
     limit?: number;
@@ -29,9 +30,9 @@ export default class MovieService {
         @InjectRepository(WatchLater) private readonly watchLaterRepo: Repository<WatchLater>,
         @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
         @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
-        // @InjectRepository(Movie) private readonly movieRepo: Repository<Movie>,
-  
-        @InjectModel('movies') private readonly movieModel: Model<Movie>,
+        @InjectRepository(Movie) private readonly movieRepo: Repository<Movie>,
+
+        @InjectModel('movies') private readonly movieModel: Model<IMovie>,
 
     ) {}
 
@@ -343,5 +344,31 @@ export default class MovieService {
 
       await this.reviewRepo.remove(review);
       return reviewId;
+    }
+
+    async getMoviesWithObjectIds(objectIds: string[]) {
+      const movies = await this.movieModel.find({ _id: { $in: objectIds } });
+
+      return movies.map((movie) => ({
+        id: movie.id,
+        tmdb_id: movie.tmdb_id,
+        backdrop_path: movie.backdrop_path,
+        title: movie.title,
+        original_title: movie.original_title,
+        tagline: movie.tagline,
+        release_date: movie.release_date,
+        budget: movie.budget,
+        revenue: movie.revenue,
+        runtime: movie.runtime,
+        popularity: movie.popularity,
+        video: movie.video,
+        status: movie.status,
+        poster_path: movie.poster_path,
+        genres: movie.genres.map((genre) => genre.id),
+        overview: movie.overview,
+        // trailers: [],
+        // keywords: [],
+        // movie_cast: [],
+      }));
     }
 };

@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column , OneToMany} from 'typeorm';
 import { Movies_Casts_Combined } from './movie-cast-combined.entity';
-@Entity('movie') // Tên bảng là "users"
+@Entity('movie')
 export class Movie {
   @PrimaryColumn('varchar', { length: 24 })
   id: string;
@@ -49,6 +49,7 @@ export class Movie {
 
   @Column('varchar', { array: true, nullable: true })
   trailers: string[]; 
+
   @Column('text', { nullable: true })
   overview: string;
 
@@ -56,5 +57,5 @@ export class Movie {
   keywords: string[];
 
   @OneToMany(() => Movies_Casts_Combined, (movie_cast) => movie_cast.movie)
-  movie_cast: Movies_Casts_Combined[]; // Danh sách review liên kết với bộ phim
+  movie_cast: Movies_Casts_Combined[];
 }
