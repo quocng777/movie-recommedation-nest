@@ -347,30 +347,7 @@ export default class MovieService {
     }
 
     async getMoviesWithObjectIds(objectIds: string[]) {
-      const movies = await this.movieModel.find({ _id: { $in: objectIds } });
+          const url = `https://awd-llm.azurewebsites.net/retriever/`;
 
-      return movies.map((movie) => ({
-        id: movie.id,
-        tmdb_id: movie.tmdb_id,
-        backdrop_path: movie.backdrop_path,
-        title: movie.title,
-        original_title: movie.original_title,
-        original_language: movie.original_language,
-        tagline: movie.tagline,
-        release_date: movie.release_date,
-        budget: movie.budget,
-        revenue: movie.revenue,
-        runtime: movie.runtime,
-        popularity: movie.popularity,
-        video: movie.video,
-        status: movie.status,
-        poster_path: movie.poster_path,
-        genre_ids: movie.genres.map((genre) => genre.id),
-        genres: movie.genres.map((genre) => ({
-          id: genre.id,
-          name: genre.name,
-        })),
-        overview: movie.overview,
-      }));
     }
 };
