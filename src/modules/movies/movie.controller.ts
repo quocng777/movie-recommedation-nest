@@ -119,6 +119,12 @@ export class MovieController {
     return this.movieService.getRating(user.id, movieId);
   }
 
+  @Public()
+  @Get('/:movieId/rating/average')
+  async getAverageRatingOfMovie(@Param('movieId') movieId: number) {
+    return this.movieService.getAverageRating(movieId);
+  }
+
   @Get('/rating')
   async getRatings(@Req() req: Request) {
     const user = req.user as UserDto;

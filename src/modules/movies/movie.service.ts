@@ -221,6 +221,17 @@ export default class MovieService {
         : null;
     }
 
+    async getAverageRating(movieId: number) {
+      const ratings = await this.ratingRepo.find({ where: { movieId } });
+      const voteCount = ratings.length;
+      const voteAverage = voteCount > 0 ? ratings.reduce((acc, rating) => acc + rating.score, 0) / voteCount : 0;
+
+      return {
+        vote_count: voteCount,
+        vote_average: voteAverage,
+      };
+    }
+
     async getRatings(userId: number) {
       const ratings = await this.ratingRepo.find({
         where: {
