@@ -128,8 +128,20 @@ export class MovieController {
   @Public()
   @Get('/:movieId/reviews')
   @HttpCode(HttpStatus.OK)
-  async getReviewsByMovie(@Param('movieId') movieId: number) {
-    return this.movieService.getReviews(movieId);
+  async getReviewsByMovie(
+    @Param('movieId') movieId: number,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    ) {
+    if (isNaN(page)) {
+      page = 1;
+    }
+
+    if (isNaN(limit)) {
+      limit = 10;
+    }
+
+    return this.movieService.getReviews(movieId, page, limit);
   }
 
   @Public()
