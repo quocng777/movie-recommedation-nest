@@ -37,6 +37,37 @@ export type FilterParams = {
   voteValues?: number[];
 };
 
+export type MovieVideo = {
+  id: number;
+  results: Video[];
+};
+
+export type Video = {
+  iso_639_1: string;
+  iso_3166_1: string;
+  name: string;
+  key: string;
+  site: string;
+  size: number;
+  type: string;
+  official: string;
+  published_at: string;
+  id: string;
+};
+
+export type MovieKeywords = {
+  id: number;
+  name: string;
+};
+
+export type MovieCast = {
+  adult: boolean;
+  id: number;
+  profile_path: string;
+  name: string;
+  character: string;
+};
+
 export const SortOptions = {
   POPULARITY_ASC: {
     KEY: 'popularity.asc',

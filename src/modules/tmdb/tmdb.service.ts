@@ -1,7 +1,7 @@
 import { HttpClient } from "@/shared/http/http-client/http-client";
 import { TmdbMovieDto } from "@/shared/tmdb/dtos/tmdb-movie.dto";
 import { TmdbPageResponse } from "@/shared/tmdb/dtos/tmdb-page.dto";
-import { FilterParams, Movie, SortOptions } from "@/shared/tmdb/types/movie.type";
+import { FilterParams, Movie, MovieCast, MovieKeywords, MovieVideo, SortOptions } from "@/shared/tmdb/types/movie.type";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
@@ -36,5 +36,23 @@ export default class TmdbService {
 
     async discoverMovies(queryUrl: string) {
         return this.httpClient.get<TmdbPageResponse<Movie>>({url: '/discover/movie?' + queryUrl});
+    }
+
+    async getMovieVideos(movieId: number) {
+        return this.httpClient.get<MovieVideo>({
+          url: `/movie/${movieId}/videos`,
+        });
+    }
+
+    async getMovieKeywords(movieId: number) {
+        return this.httpClient.get<MovieKeywords>({
+          url: `/movie/${movieId}/keywords`,
+        });
+    }
+
+    async getMovieCasts(movieId: number) {
+        return this.httpClient.get<{ id: number; cast: MovieCast[] }>({
+          url: `/movie/${movieId}/credits`,
+        });
     }
 };
