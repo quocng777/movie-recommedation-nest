@@ -6,7 +6,7 @@ import {
     JoinColumn,
   } from 'typeorm';
   import { Movie } from './movie.entity';
-  import { Person } from '@/modules/person/entities/person.entity';
+  import { Person } from '@/modules/people/entities/person.entity';
   
   @Entity('movie_cast_combined')
   export class Movies_Casts_Combined {

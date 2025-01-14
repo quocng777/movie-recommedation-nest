@@ -17,7 +17,7 @@ import { MovieSchema } from "./schemas/movie.schema";
 import { PeopleSchema} from "./schemas/people.schema";
 @Module({
   imports: [ 
-    MongooseModule.forFeature([{ name: "movies", schema: MovieSchema }, { name: "people", schema: PeopleSchema }]),
+    MongooseModule.forFeature([{ name: "movies", schema: MovieSchema }]),
     TypeOrmModule.forFeature([LikedMovie, WatchLater, Rating, Review, Movie ]),
     TmdbModule
   ], 

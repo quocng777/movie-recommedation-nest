@@ -8,7 +8,7 @@ import PlaylistItem from "@/modules/playlist/entities/playlist-item.entity";
 import Rating from "@/modules/movies/entities/rating.entity";
 import Review from "@/modules/movies/entities/review.entity";
 import { Movie } from "@/modules/movies/entities/movie.entity";
-import { Person } from "@/modules/person/entities/person.entity";
+import { Person } from "@/modules/people/entities/person.entity";
 import { Movies_Casts_Combined } from "@/modules/movies/entities/movie-cast-combined.entity";
 
 const nodeEnv = process.env.NODE_ENV || 'development';
