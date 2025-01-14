@@ -18,6 +18,4 @@ export class PeopleService {
     console.log(person); 
     return person;
   }
-  
-  
 }

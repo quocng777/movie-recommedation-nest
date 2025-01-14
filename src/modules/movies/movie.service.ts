@@ -14,6 +14,7 @@ import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { Movie } from "./entities/movie.entity";
 import { IMovie } from "./schemas/movie.schema";
+import { FilterParams } from "@/shared/tmdb/types/movie.type";
 export interface MovieQueryOptions {
     page?: number;
     limit?: number;
@@ -61,14 +62,6 @@ export default class MovieService {
     //         }
     //     };
     // }
-    async getMovie(movieId: string) {
-        const movie = await this.movieModel.findById(movieId).exec();
-        if (!movie ) {  
-            throw new Error('Movie not found');  
-        }
-        return movie;  
-    }
-    
       
     async findLikedMoviesByUserId(userId: number) {
         console.log("Check" + userId)
@@ -376,5 +369,127 @@ export default class MovieService {
         })),
         overview: movie.overview,
       }));
+    }
+
+    async getMovieById(movieId: number) {
+      const movie = await this.tmdbService.getFullMovieById(movieId);
+      const ratings = await this.ratingRepo.find({ where: { movieId: movieId } });
+
+      const voteCount = ratings.length;
+      const voteAverage = ratings.reduce((acc, rating) => acc + rating.score, 0) / voteCount;
+
+      movie.vote_count = voteCount;
+      movie.vote_average = voteAverage;
+
+      return movie;
+    }
+
+    async searchMovies(query: string, page: number = 1) {
+      const response = await this.tmdbService.searchMovies(query, page);
+      const movies = response.results;      
+      for (let i = 0; i < movies.length; i++) {
+        const ratings = await this.ratingRepo.find({ where: { movieId: movies[i].id } });
+        
+        const voteCount = ratings.length;
+        const voteAverage = voteCount > 0 ? ratings.reduce((acc, rating) => acc + rating.score, 0) / voteCount : 0;
+
+        movies[i].vote_count = voteCount;
+        movies[i].vote_average = voteAverage;
+      }
+
+      return response;
+    }
+
+    async getPopularMovies() {
+      const response = await this.tmdbService.getPopularMovies();
+      const movies = response.results;
+      for (let i = 0; i < movies.length; i++) {
+        const ratings = await this.ratingRepo.find({ where: { movieId: movies[i].id } });
+        
+        const voteCount = ratings.length;
+        const voteAverage = voteCount > 0 ? ratings.reduce((acc, rating) => acc + rating.score, 0) / voteCount : 0;
+
+        movies[i].vote_count = voteCount;
+        movies[i].vote_average = voteAverage;
+      }
+
+      return response;
+    }
+
+    async getTrendingMovies(mediaType: string, duration: string) {
+      const response = await this.tmdbService.getTrendingMovies(mediaType, duration);
+      const movies = response.results;
+      for (let i = 0; i < movies.length; i++) {
+        const ratings = await this.ratingRepo.find({ where: { movieId: movies[i].id } });
+        
+        const voteCount = ratings.length;
+        const voteAverage = voteCount > 0 ? ratings.reduce((acc, rating) => acc + rating.score, 0) / voteCount : 0;
+
+        movies[i].vote_count = voteCount;
+        movies[i].vote_average = voteAverage;
+      }
+
+      return response;
+    }
+
+    async getNowPlayingMovies() {
+      const response = await this.tmdbService.getNowPlayingMovies();
+      const movies = response.results;
+
+      for (let i = 0; i < movies.length; i++) {
+        const ratings = await this.ratingRepo.find({ where: { movieId: movies[i].id } });
+        
+        const voteCount = ratings.length;
+        const voteAverage = voteCount > 0 ? ratings.reduce((acc, rating) => acc + rating.score, 0) / voteCount : 0;
+
+        movies[i].vote_count = voteCount;
+        movies[i].vote_average = voteAverage;
+      }
+
+      return response;
+    }
+
+    async discoverMovies(queryString: string) {
+      const response = await this.tmdbService.discoverMovies(queryString);
+      const movies = response.results;
+
+      for (let i = 0; i < movies.length; i++) {
+        const ratings = await this.ratingRepo.find({ where: { movieId: movies[i].id } });
+        
+        const voteCount = ratings.length;
+        const voteAverage = voteCount > 0 ? ratings.reduce((acc, rating) => acc + rating.score, 0) / voteCount : 0;
+
+        movies[i].vote_count = voteCount;
+        movies[i].vote_average = voteAverage;
+      }
+
+      const filters = new URLSearchParams(queryString);
+      const sortBy = filters.get('sort_by');
+      const voteAverageGte = parseInt(filters.get('vote_average.gte') || '0');
+      const voteAverageLte = parseInt(
+        filters.get('vote_average.lte') || '10',
+      );
+      const voteCountGte = parseInt(filters.get('vote_count.gte') || '0');
+      const voteCountLte = parseInt(
+        filters.get('vote_count.lte') || '500'
+      );
+
+      const filteredMovies = movies.filter(
+        (movie) =>
+          movie.vote_average >= voteAverageGte &&
+          movie.vote_average <= voteAverageLte &&
+          movie.vote_count >= voteCountGte &&
+          movie.vote_count <= voteCountLte,
+      );
+
+      if (sortBy === 'vote_average.asc') {
+        filteredMovies.sort((a, b) => a.vote_average - b.vote_average);
+      } else if (sortBy === 'vote_average.desc') {
+        filteredMovies.sort((a, b) => b.vote_average - a.vote_average);
+      }
+
+      response.results = filteredMovies;
+
+      return response;
     }
 };
