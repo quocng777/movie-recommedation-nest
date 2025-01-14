@@ -1,11 +1,16 @@
-import { Schema, Document , Types} from 'mongoose';
+import mongoose, { Schema, Document , Types, mongo} from 'mongoose';
 
-export interface Genre extends Document {
+export interface IGenre extends Document {
   name: string;
-  movies: Types.Array<string>; 
+  tmdb_id: number;
 }
 
-export const GenreSchema = new Schema<Genre>({
-  name: { type: String, required: true },
-  movies: [{ type: Schema.Types.ObjectId, ref: 'Movie' }]
-});
+export const GenreSchema = new Schema<IGenre>(
+  {
+    name: { type: String, required: true },
+    tmdb_id: { type: Number, required: true },
+  },
+  { collection: 'movie_genres' },
+);
+
+export const GenreModel = mongoose.model<IGenre>('Genre', GenreSchema);

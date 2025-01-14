@@ -13,6 +13,7 @@ import { UserMiniDto } from "../user/dto/user-mini.dto";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { Movie } from "./entities/movie.entity";
+import { IMovie } from "./schemas/movie.schema";
 export interface MovieQueryOptions {
     page?: number;
     limit?: number;
@@ -29,9 +30,9 @@ export default class MovieService {
         @InjectRepository(WatchLater) private readonly watchLaterRepo: Repository<WatchLater>,
         @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
         @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
-        // @InjectRepository(Movie) private readonly movieRepo: Repository<Movie>,
-  
-        @InjectModel('movies') private readonly movieModel: Model<Movie>,
+        @InjectRepository(Movie) private readonly movieRepo: Repository<Movie>,
+
+        @InjectModel('movies') private readonly movieModel: Model<IMovie>,
 
     ) {}
 
@@ -247,11 +248,13 @@ export default class MovieService {
                 }));
     }
 
-    async getReviews(movieId: number) {
+    async getReviews(movieId: number, page: number = 1, limit: number = 10) {
       const reviews = await this.reviewRepo.find({
         where: { movie_id: movieId },
         relations: ['user'],
         order: { created_at: 'DESC' },
+        skip: (page - 1) * limit,
+        take: limit,
       });
 
       const total = await this.reviewRepo.count({ where: { movie_id: movieId } });
@@ -263,6 +266,8 @@ export default class MovieService {
           user: userMini[index],
         })),
         total,
+        current_page: page,
+        total_pages: Math.ceil(total / limit),
       }
     }
 
@@ -343,5 +348,33 @@ export default class MovieService {
 
       await this.reviewRepo.remove(review);
       return reviewId;
+    }
+
+    async getMoviesWithObjectIds(objectIds: string[]) {
+      const movies = await this.movieModel.find({ _id: { $in: objectIds } });
+
+      return movies.map((movie) => ({
+        id: movie.id,
+        tmdb_id: movie.tmdb_id,
+        backdrop_path: movie.backdrop_path,
+        title: movie.title,
+        original_title: movie.original_title,
+        original_language: movie.original_language,
+        tagline: movie.tagline,
+        release_date: movie.release_date,
+        budget: movie.budget,
+        revenue: movie.revenue,
+        runtime: movie.runtime,
+        popularity: movie.popularity,
+        video: movie.video,
+        status: movie.status,
+        poster_path: movie.poster_path,
+        genre_ids: movie.genres.map((genre) => genre.id),
+        genres: movie.genres.map((genre) => ({
+          id: genre.id,
+          name: genre.name,
+        })),
+        overview: movie.overview,
+      }));
     }
 };

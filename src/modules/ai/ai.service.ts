@@ -5,16 +5,19 @@ import { ConfigService } from "@nestjs/config";
 import { catchError, firstValueFrom } from "rxjs";
 import { AxiosError } from "axios";
 import { InjectModel } from "@nestjs/mongoose";
-import { Movie } from "../movies/schemas/movie.schema";
+import { IMovie } from "../movies/schemas/movie.schema";
+import { IGenre } from "../movies/schemas/genre.schema";
 import { Model } from "mongoose";
 import { NavigationResponse, NavigationRoute } from "./interfaces/navigation-response.interface";
+import { RetrieverResponse } from "./interfaces/retriever-response.interface";
 
 @Injectable()
 export class AiService {
   private readonly llmApiKey: string;
   constructor(private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    @InjectModel("movies") private movieModel: Model<Movie>,
+    @InjectModel("movies") private movieModel: Model<IMovie>,
+    @InjectModel("genres") private genreModel: Model<IGenre>
   ) {
     this.llmApiKey = configService.get('LLM_API_KEY');
   }
@@ -35,17 +38,52 @@ export class AiService {
       );
 
     const { data } = await firstValueFrom(res);
-    
-    // just for test
+
     if(data.data.route === NavigationRoute.CAST_PAGE && data.data.params) {
-      data.data.params = (await this.movieModel.find({ _id: { $in: data.data.params.movie_ids } }).exec()).flat();
-
-      if(data.data.params.length === 0) {
+      const movies = await this.movieModel.find({ _id: { $in: data.data.params.movie_ids } });
+      
+      if (movies.length === 0) {
         data.data.route = NavigationRoute.NONE;
+        data.data.params = null;
+      } else {
+        data.data.params = movies.map((movie: IMovie) => {
+          return {
+            id: movie.tmdb_id,
+            name: movie.title,
+          }
+        });
       }
-    }
 
-    if(!data.data.params) {
+    } else if (data.data.route === NavigationRoute.MOVIE_PAGE && data.data.params) {
+      const movies = await this.movieModel.find({ _id: { $in: data.data.params.movie_ids } });
+      
+      if (movies.length === 0) {
+        data.data.route = NavigationRoute.NONE;
+        data.data.params = null;
+      } else {
+        data.data.params = movies.map((movie: IMovie) => {
+          return {
+            id: movie.tmdb_id,
+            name: movie.title,
+          }
+        });
+      }
+
+    } else if (data.data.route === NavigationRoute.GENRE_PAGE && data.data.params) {
+      const genres = await this.genreModel.find({ _id: { $in: data.data.params.genre_ids } });
+
+      if (genres.length === 0) {
+        data.data.route = NavigationRoute.NONE;
+        data.data.params = null;
+      } else {
+        data.data.params = genres.map((genre: IGenre) => {
+          return {
+            id: genre.tmdb_id,
+            name: genre.name,
+          }
+        });
+      }
+    } else if (!data.data.params) {
       data.data.route = NavigationRoute.NONE;
     }
 
@@ -53,7 +91,6 @@ export class AiService {
   }
 
   async retrieveMovies(collectionName: string, query: string, amount: number = 10, threshold: number = 0.25) {
-    const url = `https://awd-llm.azurewebsites.net/retriever/`;
     const params = {
       llm_api_key: this.llmApiKey,
       collection_name: collectionName,
@@ -62,21 +99,76 @@ export class AiService {
       threshold,
     };
   
-    try {
-      
-      const res = this.httpService.get(url, { params }).pipe(
+    const res = this.httpService
+      .get<RetrieverResponse>('/retriever/', 
+        { 
+          params, 
+          headers: {
+            Accept: 'application/json'
+          }
+        })
+      .pipe(
+      catchError((error: AxiosError) => {
+        console.error('Error retrieving movies:', error.message);
+        throw new InternalServerErrorException('Failed to retrieve movies');
+      }),
+    );
+    
+    const { data } = await firstValueFrom(res);
+
+    if (!data.data.result || data.data.result.length === 0) {
+      data.data.result = [];
+    } else {
+      const objectIds = data.data.result;
+      const movies = await this.movieModel.find({ _id: { $in: objectIds } });
+
+      data.data.result = movies.map((movie) => ({
+        id: movie.tmdb_id,
+        backdrop_path: movie.backdrop_path,
+        title: movie.title,
+        original_title: movie.original_title,
+        original_language: movie.original_language,
+        tagline: movie.tagline,
+        release_date: movie.release_date,
+        budget: movie.budget,
+        revenue: movie.revenue,
+        runtime: movie.runtime,
+        popularity: movie.popularity,
+        video: movie.video,
+        status: movie.status,
+        poster_path: movie.poster_path,
+        genre_ids: movie.genres.map((genre) => genre.id),
+        genres: movie.genres.map((genre) => ({
+          id: genre.id,
+          name: genre.name,
+        })),
+        overview: movie.overview,
+      }));
+    }
+
+    return data.data;
+  }
+
+  async rag(collectionName: string, query: string) {
+    const res = this.httpService
+      .post('/rag/', {
+        llm_api_key: this.llmApiKey,
+        collection_name: collectionName,
+        query,
+      })
+      .pipe(
         catchError((error: AxiosError) => {
           console.error('Error retrieving movies:', error.message);
           throw new InternalServerErrorException('Failed to retrieve movies');
         }),
       );
-      const { data } = await firstValueFrom(res);
 
-      return data; 
-    } catch (error) {
-      console.error('Error in retrieveMovies:', error);
-      throw new InternalServerErrorException('Failed to process retrieveMovies');
+    const { data } = await firstValueFrom(res);
+
+    if (!data.data.result) {
+      data.data.result = null;
     }
+
+    return data.data.result;
   }
-  
 }

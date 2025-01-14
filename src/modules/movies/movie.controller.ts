@@ -32,8 +32,6 @@ export class MovieController {
     private readonly movieService: MovieService,
   ) {}
 
-  
-
   @Public()
   @Get('/trending')
   async getTrendingMovie() {
@@ -48,7 +46,6 @@ export class MovieController {
 
   @Get('/liked')
   async getLikedMovies(@Req() req) {
-    console.log("Check" + req);
     const user = req.user as UserDto;
     return this.movieService.findLikedMoviesByUserId(user.id);
   }
@@ -131,8 +128,20 @@ export class MovieController {
   @Public()
   @Get('/:movieId/reviews')
   @HttpCode(HttpStatus.OK)
-  async getReviewsByMovie(@Param('movieId') movieId: number) {
-    return this.movieService.getReviews(movieId);
+  async getReviewsByMovie(
+    @Param('movieId') movieId: number,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    ) {
+    if (isNaN(page)) {
+      page = 1;
+    }
+
+    if (isNaN(limit)) {
+      limit = 10;
+    }
+
+    return this.movieService.getReviews(movieId, page, limit);
   }
 
   @Public()
@@ -185,8 +194,18 @@ export class MovieController {
     const user = req.user as UserDto;
     return this.movieService.deleteReview(reviewId, movieId, user.id);
   }
+
   @Get('/movie/:id')
   async getMovie(@Param('id') id: string) {
     return this.movieService.getMovie(id);
+  }
+
+  // Dark magic :))
+  @Public()
+  @Get('/get-with-objectids')
+  async getTmdbMovie(@Query('objectIds') objectIds: string) {
+    console.log(objectIds);
+    const idsArray = objectIds.split(',');
+    return this.movieService.getMoviesWithObjectIds(idsArray);
   }
 }

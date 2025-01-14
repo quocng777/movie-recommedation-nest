@@ -12,12 +12,13 @@ import Review from "./entities/review.entity";
 
 // Mongoose Schema
 import { TmdbModule } from "../tmdb/tmdb.module";
-// import { Movie} from "./entities/movie.entity";
-import { Movie, MovieSchema } from "./schemas/movie.schema";
+import { Movie} from "./entities/movie.entity";
+import { MovieSchema } from "./schemas/movie.schema";
+import { PeopleSchema} from "./schemas/people.schema";
 @Module({
   imports: [ 
     MongooseModule.forFeature([{ name: "movies", schema: MovieSchema }]),
-    TypeOrmModule.forFeature([LikedMovie, WatchLater, Rating, Review]),
+    TypeOrmModule.forFeature([LikedMovie, WatchLater, Rating, Review, Movie ]),
     TmdbModule
   ], 
   controllers: [MovieController],

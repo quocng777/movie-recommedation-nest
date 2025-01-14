@@ -5,13 +5,14 @@ import { HttpModule } from "@nestjs/axios";
 import { LlmHttpConfigService } from "@/config/llm-http.config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MovieModel, MovieSchema } from "../movies/schemas/movie.schema";
+import { GenreSchema } from "../movies/schemas/genre.schema";
 
 @Module({
   imports: [
     HttpModule.registerAsync({
       useClass: LlmHttpConfigService,
     }),
-    MongooseModule.forFeature([{schema: MovieSchema, name: "movies"}])
+    MongooseModule.forFeature([{schema: MovieSchema, name: "movies"}, {schema: GenreSchema, name: "genres"}]),
   ],
   controllers: [AiController],
   providers: [AiService]

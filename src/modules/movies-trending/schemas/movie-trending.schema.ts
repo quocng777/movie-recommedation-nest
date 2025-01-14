@@ -41,7 +41,7 @@ export interface ICredits {
   crew: ICrewPerson[];
 }
 
-export interface IMovie extends Document {
+export interface IMovieTrending extends Document {
   tmdb_id: number;
   adult: boolean;
   backdrop_path: string;
@@ -66,7 +66,7 @@ export interface IMovie extends Document {
   credits: ICredits;
 }
 
-export const MovieSchema = new Schema<IMovie>(
+export const MovieTrendingSchema = new Schema<IMovieTrending>(
   {
     tmdb_id: { type: Number, required: true },
     adult: { type: Boolean, required: true },
@@ -132,4 +132,4 @@ export const MovieSchema = new Schema<IMovie>(
   { collection: 'movies' },
 );
 
-export const MovieModel = mongoose.model<IMovie>('Movie', MovieSchema);
+export const MovieModel = mongoose.model<IMovieTrending>('Movie', MovieTrendingSchema);

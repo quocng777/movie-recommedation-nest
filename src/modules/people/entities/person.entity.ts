@@ -40,7 +40,7 @@ export class Person {
   imdb_id: string;
 
   @Column('float', { nullable: false })
-  popularity: string;
+  popularity: number;
 
   @Column('varchar', { nullable: true })
   profile_path: string;

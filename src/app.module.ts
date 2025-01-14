@@ -20,7 +20,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { mongooseConfig } from './config/mongoose.config';
 import { AiModule } from './modules/ai/ai.module';
 import { MovieModule } from './modules/movies/movie.module';
-import { PersonModule } from './modules/person/person.module';
+import { PeopleModule } from './modules/people/people.module';
+import { MoviesPopularModule } from './modules/movies-popular/movies-popular.module';
+import { MoviesTrendingModule } from './modules/movies-trending/movies-trending.module';
 
 @Module({
   imports: [ 
@@ -61,7 +63,9 @@ import { PersonModule } from './modules/person/person.module';
     PlaylistModule,
     AiModule,
     MovieModule,
-    PersonModule
+    PeopleModule,
+    MoviesPopularModule,
+    MoviesTrendingModule,
   ],
   providers: [
     {
@@ -73,5 +77,5 @@ import { PersonModule } from './modules/person/person.module';
     //   useClass: JwtAuthGuard,
     // }
   ],
-}) 
+})
 export class AppModule {}
