@@ -119,6 +119,12 @@ export class MovieController {
     return this.movieService.getRating(user.id, movieId);
   }
 
+  @Public()
+  @Get('/:movieId/rating/average')
+  async getAverageRatingOfMovie(@Param('movieId') movieId: number) {
+    return this.movieService.getAverageRating(movieId);
+  }
+
   @Get('/rating')
   async getRatings(@Req() req: Request) {
     const user = req.user as UserDto;
@@ -132,7 +138,7 @@ export class MovieController {
     @Param('movieId') movieId: number,
     @Query('page') page: number,
     @Query('limit') limit: number,
-    ) {
+  ) {
     if (isNaN(page)) {
       page = 1;
     }
@@ -195,11 +201,6 @@ export class MovieController {
     return this.movieService.deleteReview(reviewId, movieId, user.id);
   }
 
-  @Get('/movie/:id')
-  async getMovie(@Param('id') id: string) {
-    return this.movieService.getMovie(id);
-  }
-
   // Dark magic :))
   @Public()
   @Get('/get-with-objectids')
@@ -207,5 +208,55 @@ export class MovieController {
     console.log(objectIds);
     const idsArray = objectIds.split(',');
     return this.movieService.getMoviesWithObjectIds(idsArray);
+  }
+
+  // tmdb emulated endpoints
+  @Public()
+  @Get('/search')
+  async searchMovie(
+    @Query('query') query: string,
+    @Query('page') page: number,
+  ) {
+    if (isNaN(page)) {
+      page = 1;
+    }
+    return this.movieService.searchMovies(query, page);
+  }
+
+  @Public()
+  @Get('/popular')
+  async getPopularMovies() {
+    return this.movieService.getPopularMovies();
+  }
+
+  @Public()
+  @Get('/trending/:mediaType/:duration')
+  async getTrendingMovies(
+    @Param('mediaType') mediaType: string,
+    @Param('duration') duration: string,
+  ) {
+    return this.movieService.getTrendingMovies(mediaType, duration);
+  }
+
+  @Public()
+  @Get('/now-playing')
+  async getNowPlayingMovies() {
+    return this.movieService.getNowPlayingMovies();
+  }
+
+  @Public()
+  @Get('/discover')
+  async discoverMovies(@Query() query: Record<string, string>) {
+    const queryString = Object.keys(query)
+      .map((key) => `${key}=${query[key]}`)
+      .join('&');
+
+    return this.movieService.discoverMovies(queryString);
+  }
+
+  @Public()
+  @Get('/detail/:movieId')
+  async getMovieById(@Param('movieId') movieId: number) {
+    return this.movieService.getMovieById(movieId);
   }
 }

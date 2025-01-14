@@ -16,6 +16,7 @@ export class TmdbMovieDto {
     @Expose({name: 'original_title'})
     originalTitle: string;
 
+    @Expose({name: 'overview'})
     overview: string;
 
     @Expose({name: 'poster_path'})

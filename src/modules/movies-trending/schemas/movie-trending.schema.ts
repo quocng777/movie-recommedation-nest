@@ -132,4 +132,4 @@ export const MovieTrendingSchema = new Schema<IMovieTrending>(
   { collection: 'movies' },
 );
 
-export const MovieModel = mongoose.model<IMovieTrending>('MovieTrending', MovieTrendingSchema);
+export const MovieTrendingModel = mongoose.model<IMovieTrending>('MovieTrending', MovieTrendingSchema);
