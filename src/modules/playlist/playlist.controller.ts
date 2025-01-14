@@ -60,14 +60,12 @@ export default class PlaylistController {
         return this.playlistService.addMovie(user.id, id, movieId);
     }
 
-    @Public()
     @Get('/:id')
     async getPlaylist(@Req() req, @Param() param) {
         const {id} = param;
-        const user = req.user;
-        const userId = user?.id;
+        const user = req.user as UserDto;
 
-        return this.playlistService.getPlaylist(id, userId);
+        return this.playlistService.getPlaylist(id, user.id);
     }
 
     @Delete('/:id/movies')
