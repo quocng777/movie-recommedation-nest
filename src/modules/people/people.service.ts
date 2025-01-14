@@ -13,9 +13,11 @@ export class PeopleService {
     return this.movieModel.find().exec(); 
   }
 
-  findOne(id: string) {
-    return this.movieModel.findById(id).exec(); // Tìm một người theo id
+  async findOne(id: string) {
+    const person = await this.movieModel.findOne({ tmdb_id: id }).exec();
+    console.log(person); 
+    return person;
   }
-
+  
   
 }

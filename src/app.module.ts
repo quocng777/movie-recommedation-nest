@@ -21,6 +21,8 @@ import { mongooseConfig } from './config/mongoose.config';
 import { AiModule } from './modules/ai/ai.module';
 import { MovieModule } from './modules/movies/movie.module';
 import { PeopleModule } from './modules/people/people.module';
+import { MoviesPopularModule } from './modules/movies-popular/movies-popular.module';
+import { MoviesTrendingModule } from './modules/movies-trending/movies-trending.module';
 
 @Module({
   imports: [ 
@@ -62,6 +64,8 @@ import { PeopleModule } from './modules/people/people.module';
     AiModule,
     MovieModule,
     PeopleModule,
+    MoviesPopularModule,
+    MoviesTrendingModule,
   ],
   providers: [
     {
