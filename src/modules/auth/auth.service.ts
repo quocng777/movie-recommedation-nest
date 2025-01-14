@@ -103,9 +103,7 @@ export class AuthService {
           ...result
         } = user;
 
-        return {
-
-        }
+        return result;
     }
 
     async verifyActivateToken(token: string) {
