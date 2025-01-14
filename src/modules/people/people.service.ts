@@ -15,6 +15,9 @@ export class PeopleService {
 
   async findOne(id: string) {
     const person = await this.movieModel.findOne({ tmdb_id: id }).exec();
+    if (!person) {
+        throw new Error('Person not found');
+    }
     console.log(person); 
     return person;
   }
