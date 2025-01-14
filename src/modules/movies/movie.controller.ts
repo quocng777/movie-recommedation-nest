@@ -46,7 +46,6 @@ export class MovieController {
 
   @Get('/liked')
   async getLikedMovies(@Req() req) {
-    console.log('Check' + req);
     const user = req.user as UserDto;
     return this.movieService.findLikedMoviesByUserId(user.id);
   }

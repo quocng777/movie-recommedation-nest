@@ -16,7 +16,4 @@ export class PeopleController {
     return this.personService.findOne(id);
   }
 
-  
-
-
 }

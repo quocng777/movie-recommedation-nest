@@ -148,4 +148,27 @@ export class AiService {
 
     return data.data;
   }
+
+  async rag(collectionName: string, query: string) {
+    const res = this.httpService
+      .post('/rag/', {
+        llm_api_key: this.llmApiKey,
+        collection_name: collectionName,
+        query,
+      })
+      .pipe(
+        catchError((error: AxiosError) => {
+          console.error('Error retrieving movies:', error.message);
+          throw new InternalServerErrorException('Failed to retrieve movies');
+        }),
+      );
+
+    const { data } = await firstValueFrom(res);
+
+    if (!data.data.result) {
+      data.data.result = null;
+    }
+
+    return data.data.result;
+  }
 }
