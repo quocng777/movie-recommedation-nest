@@ -10,6 +10,9 @@ import { IGenre } from "../movies/schemas/genre.schema";
 import { Model } from "mongoose";
 import { NavigationResponse, NavigationRoute } from "./interfaces/navigation-response.interface";
 import { RetrieverResponse } from "./interfaces/retriever-response.interface";
+import { Repository } from "typeorm";
+import Rating from "../movies/entities/rating.entity";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class AiService {
@@ -17,7 +20,8 @@ export class AiService {
   constructor(private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     @InjectModel("movies") private movieModel: Model<IMovie>,
-    @InjectModel("genres") private genreModel: Model<IGenre>
+    @InjectModel("genres") private genreModel: Model<IGenre>,
+    @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>
   ) {
     this.llmApiKey = configService.get('LLM_API_KEY');
   }
@@ -49,7 +53,7 @@ export class AiService {
         data.data.params = movies.map((movie: IMovie) => {
           return {
             id: movie.tmdb_id,
-            name: movie.title,
+            name: movie.title || movie.original_title
           }
         });
       }
@@ -122,6 +126,22 @@ export class AiService {
       const objectIds = data.data.result;
       const movies = await this.movieModel.find({ _id: { $in: objectIds } });
 
+      for (let i = 0; i < movies.length; i++) {
+        // overwrite rating
+        const ratings = await this.ratingRepo.find({
+          where: { movieId: movies[i].tmdb_id },
+        });
+
+        const voteCount = ratings.length;
+        const voteAverage =
+          voteCount > 0
+            ? ratings.reduce((acc, rating) => acc + rating.score, 0) / voteCount
+            : 0;
+
+        movies[i].vote_count = voteCount;
+        movies[i].vote_average = voteAverage;
+      }
+
       data.data.result = movies.map((movie) => ({
         id: movie.tmdb_id,
         backdrop_path: movie.backdrop_path,
@@ -143,6 +163,8 @@ export class AiService {
           name: genre.name,
         })),
         overview: movie.overview,
+        vote_count: movie.vote_count,
+        vote_average: movie.vote_average,
       }));
     }
 
